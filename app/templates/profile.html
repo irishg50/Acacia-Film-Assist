@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .form-label {
+        font-weight: bold;
+        color: #006666;  /* Dark teal color */
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control-plaintext {
+        color: #333;
+        padding: 0.375rem 0;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Your Profile</h2>
+                    <button id="editButton" class="btn btn-primary">Edit Profile</button>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm" method="POST" action="{{ url_for('chat_bp.update_profile') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="row">
+                            <!-- Personal Information Column -->
+                            <div class="col-md-6">
+                                <h4 class="mb-3">Personal Information</h4>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <div class="form-control-plaintext">{{ current_user.username }}</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="firstname" class="form-label">First Name</label>
+                                    <div class="form-control-plaintext" id="firstnameDisplay">{{ current_user.firstname or '' }}</div>
+                                    <input type="text" class="form-control d-none" id="firstname" name="firstname" 
+                                           value="{{ current_user.firstname or '' }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="lastname" class="form-label">Last Name</label>
+                                    <div class="form-control-plaintext" id="lastnameDisplay">{{ current_user.lastname or '' }}</div>
+                                    <input type="text" class="form-control d-none" id="lastname" name="lastname" 
+                                           value="{{ current_user.lastname or '' }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="org_name" class="form-label">Organization</label>
+                                    <div class="form-control-plaintext" id="org_nameDisplay">{{ current_user.org_name or '' }}</div>
+                                    <input type="text" class="form-control d-none" id="org_name" name="org_name" 
+                                           value="{{ current_user.org_name or '' }}">
+                                </div>
+                            </div>
+                            
+                            <!-- Professional Information Column -->
+                            <div class="col-md-6">
+                                <h4 class="mb-3">Professional Information</h4>
+                                
+                                <div class="mb-3">
+                                    <label for="job_title" class="form-label">Job Title</label>
+                                    <div class="form-control-plaintext" id="job_titleDisplay">{{ survey.job_title if survey else '' }}</div>
+                                    <input type="text" class="form-control d-none" id="job_title" name="job_title" 
+                                           value="{{ survey.job_title if survey else '' }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="primary_responsibilities" class="form-label">Primary Responsibilities</label>
+                                    <div class="form-control-plaintext" id="primary_responsibilitiesDisplay">{{ survey.primary_responsibilities if survey else '' }}</div>
+                                    <textarea class="form-control d-none" id="primary_responsibilities" name="primary_responsibilities" 
+                                              rows="3">{{ survey.primary_responsibilities if survey else '' }}</textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="top_priorities" class="form-label">Top Priorities</label>
+                                    <div class="form-control-plaintext" id="top_prioritiesDisplay">{{ survey.top_priorities if survey else '' }}</div>
+                                    <textarea class="form-control d-none" id="top_priorities" name="top_priorities" 
+                                              rows="3">{{ survey.top_priorities if survey else '' }}</textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="special_interests" class="form-label">Special Areas of Interest</label>
+                                    <div class="form-control-plaintext" id="special_interestsDisplay">{{ survey.special_interests if survey else '' }}</div>
+                                    <textarea class="form-control d-none" id="special_interests" name="special_interests" 
+                                              rows="3">{{ survey.special_interests if survey else '' }}</textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="learning_goals" class="form-label">What do you want to learn?</label>
+                                    <div class="form-control-plaintext" id="learning_goalsDisplay">{{ survey.learning_goals if survey else '' }}</div>
+                                    <textarea class="form-control d-none" id="learning_goals" name="learning_goals" 
+                                              rows="3">{{ survey.learning_goals if survey else '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="submitButtons" class="d-none mt-4 text-end">
+                            <button type="submit" class="btn btn-success">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" id="cancelButton">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editButton = document.getElementById('editButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const submitButtons = document.getElementById('submitButtons');
+    const form = document.getElementById('profileForm');
+    
+    // Store original values
+    let originalValues = {};
+    const inputs = form.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        originalValues[input.id] = input.value;
+    });
+    
+    editButton.addEventListener('click', function() {
+        // Hide all plaintext displays and show form controls
+        document.querySelectorAll('.form-control-plaintext').forEach(el => el.classList.add('d-none'));
+        document.querySelectorAll('.form-control').forEach(el => el.classList.remove('d-none'));
+        submitButtons.classList.remove('d-none');
+        editButton.classList.add('d-none');
+    });
+    
+    cancelButton.addEventListener('click', function() {
+        // Restore original values
+        inputs.forEach(input => {
+            input.value = originalValues[input.id];
+        });
+        
+        // Show all plaintext displays and hide form controls
+        document.querySelectorAll('.form-control-plaintext').forEach(el => el.classList.remove('d-none'));
+        document.querySelectorAll('.form-control').forEach(el => el.classList.add('d-none'));
+        submitButtons.classList.add('d-none');
+        editButton.classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %} 

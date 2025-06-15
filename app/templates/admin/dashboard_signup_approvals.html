@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Signup Approvals{% endblock %}
+
+{% block content %}
+<h2>Pending Signup Approvals</h2>
+<p>Below are users who have registered but are awaiting admin approval.</p>
+
+{% if pending_users %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Organization</th>
+                    <th>Signup Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in pending_users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.firstname }}</td>
+                    <td>{{ user.lastname }}</td>
+                    <td>{{ user.email_address }}</td>
+                    <td>{{ user.org_name }}</td>
+                    <td>{{ user.signup_date.strftime('%Y-%m-%d %H:%M') if user.signup_date else '' }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.approve_user', user_id=user.id) }}" style="display:inline-block">
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form method="post" action="{{ url_for('admin.reject_user', user_id=user.id) }}" style="display:inline-block">
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+    <div class="alert alert-info mt-4">There are no pending signups at this time.</div>
+{% endif %}
+{% endblock %} 

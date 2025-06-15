@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - TAL-E{% endblock %}
+
+{% block content %}
+<!-- Promo Code Modal -->
+{% if show_promo_modal %}
+<div class="modal show" id="promoModal" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="POST" action="">
+        <div class="modal-header">
+          <h5 class="modal-title">Enter Promotion Code</h5>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="promo_code" class="form-label">Promotion Code</label>
+            <input type="text" class="form-control" id="promo_code" name="promo_code" placeholder="Enter code" required autofocus>
+            {% if promo_error %}
+              <div class="text-danger small mt-2">{{ promo_error }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container mt-5" style="max-width: 540px;">
+    {% if not account_created %}
+    <div class="card shadow-sm rounded-4 p-4" style="background: #fcfcff; border: 1px solid #f0f0f5;">
+        <h2 class="mb-2 text-center">Welcome, Early Tester!</h2>
+        <p class="mb-4 text-center text-secondary" style="font-size:1.1em;">Thank you for joining our early tester program. We're grateful for your willingness to help shape TAL-E! Please fill out the form below to create your account. If you have any questions, we're here to help every step of the way.</p>
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.firstname.label(class="form-label") }}
+                    {{ form.firstname(class="form-control", placeholder="First name") }}
+                    {% if request.method == 'POST' %}
+                        {% for error in form.firstname.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.lastname.label(class="form-label") }}
+                    {{ form.lastname(class="form-control", placeholder="Last name") }}
+                    {% if request.method == 'POST' %}
+                        {% for error in form.lastname.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                {{ form.org_name.label(class="form-label") }}
+                {{ form.org_name(class="form-control", placeholder="Organization (optional)") }}
+                <div class="form-text">Let us know where you work or volunteer (optional).</div>
+                {% if request.method == 'POST' %}
+                    {% for error in form.org_name.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <hr />
+            <div class="mb-3">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control", placeholder="Choose a username") }}
+                <div class="form-text">Pick something memorable for you.</div>
+                {% if request.method == 'POST' %}
+                    {% for error in form.username.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-control", placeholder="Create a password") }}
+                    <div class="form-text">At least 8 characters.</div>
+                    {% if request.method == 'POST' %}
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.confirm_password.label(class="form-label") }}
+                    {{ form.confirm_password(class="form-control", placeholder="Re-enter password") }}
+                    {% if request.method == 'POST' %}
+                        {% for error in form.confirm_password.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                {{ form.email_address.label(class="form-label") }}
+                {{ form.email_address(class="form-control", placeholder="you@email.com") }}
+                <div class="form-text">We'll never share your email. Used for important updates only.</div>
+                {% if request.method == 'POST' %}
+                    {% for error in form.email_address.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-success w-100 py-2 mt-2" style="font-size:1.15em;">Create My Early Tester Account</button>
+        </form>
+        <div class="mt-3 text-center">
+            <a href="{{ url_for('admin.login') }}">Already have an account? Log in</a>
+        </div>
+    </div>
+    {% endif %}
+    {% if account_created %}
+        <div class="alert alert-success text-center mt-4 mb-4" style="font-size:1.1em;">
+            <strong>Thank you for signing up!</strong><br>
+            Your account information has been saved and will be reviewed for approval shortly.<br>
+            <span class="text-muted">You can help TAL-E serve you better by providing some details about your work role, responsibilities, and your current priorities.</span>
+        </div>
+        <div class="card shadow-sm rounded-4 p-4 mb-4" style="background: #f8fafd; border: 1px solid #e0e6ed; max-width: 650px; margin: 0 auto;">
+            <h3 class="mb-3 text-center">Tell Us About Yourself <span class="text-muted" style="font-size:0.7em;">(Optional)</span></h3>
+            <form method="POST" action="{{ url_for('public_bp.profile_after_signup') }}">
+                <div class="mb-3">
+                    <label for="job_title" class="form-label">Job Title</label>
+                    <input type="text" class="form-control" id="job_title" name="job_title" placeholder="e.g. Development Director, Grant Writer">
+                    <div class="form-text">Your current role or title.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="org_name" class="form-label">Organization</label>
+                    <input type="text" class="form-control" id="org_name" name="org_name" placeholder="Your organization (optional)">
+                    <div class="form-text">Where you work or volunteer (optional).</div>
+                </div>
+                <div class="mb-3">
+                    <label for="primary_responsibilities" class="form-label">Primary Responsibilities</label>
+                    <textarea class="form-control" id="primary_responsibilities" name="primary_responsibilities" rows="4" placeholder="What are your main duties?"></textarea>
+                    <div class="form-text">What do you spend most of your time on?</div>
+                </div>
+                <div class="mb-3">
+                    <label for="top_priorities" class="form-label">Top Priorities</label>
+                    <textarea class="form-control" id="top_priorities" name="top_priorities" rows="4" placeholder="What are your biggest goals right now?"></textarea>
+                    <div class="form-text">What are you focused on achieving?</div>
+                </div>
+                <div class="mb-3">
+                    <label for="special_interests" class="form-label">Special Areas of Interest</label>
+                    <textarea class="form-control" id="special_interests" name="special_interests" rows="4" placeholder="e.g. Major Gifts, Events, Grants"></textarea>
+                    <div class="form-text">Any fundraising topics or skills you want to explore?</div>
+                </div>
+                <div class="mb-3">
+                    <label for="learning_goals" class="form-label">What do you want to learn?</label>
+                    <textarea class="form-control" id="learning_goals" name="learning_goals" rows="4" placeholder="What would you like to get better at?"></textarea>
+                    <div class="form-text">Let us know how we can help you grow!</div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary px-4">Save Profile (Optional)</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %} 

@@ -1,0 +1,32 @@
+Flask==3.0.3
+flask_login
+flask_session
+openai==1.75.0
+python-dotenv==1.0.1
+gunicorn
+Flask_Session==0.8.0
+Werkzeug==3.0.3
+PyMuPDF==1.24.7
+python-docx==1.1.2
+textstat==0.7.3
+psycopg2-binary==2.9.9
+flask_sqlalchemy
+anthropic
+tiktoken
+google-generativeai
+flask_wtf
+pytz
+chardet
+docx2txt
+PyPDF2
+
+# CSV and Excel handling
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# For retry handling
+tenacity>=8.0.0
+
+# for document chunking
+tiktoken
+

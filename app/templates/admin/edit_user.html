@@ -1,0 +1,94 @@
+<!-- templates/admin/edit_user.html -->
+{% extends "base.html" %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+<h2>Edit User</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="row">
+        <!-- User Profile Column -->
+        <div class="col">
+            <h5>Username</h5>
+            <div class="form-group position-relative">
+                {{ form.username.label }}
+                <input id="username-field" type="text" name="username" value="{{ form.username.data }}" class="form-control" readonly />
+                <span id="edit-username" style="position:absolute; right:10px; top:35px; cursor:pointer;" title="Edit Username">
+                    <i class="bi bi-pencil-square"></i>
+                </span>
+            </div>
+            <div class="form-group">
+                {{ form.role.label(class="form-label") }}
+                {{ form.role(class="form-select") }}
+            </div>
+            <hr />
+            <table class="table table-sm table-bordered mt-3">
+                <tbody>
+                    <tr>
+                        <th>First Name</th>
+                        <td>{{ user.firstname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Name</th>
+                        <td>{{ user.lastname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Signup Date</th>
+                        <td>{{ user.signup_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>Organization</th>
+                        <td>{{ user.org_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email Address</th>
+                        <td>{{ user.email_address }}</td>
+                    </tr>
+                    <tr>
+                        <th>Agreement Date</th>
+                        <td>{{ user.agreement_date }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Permissions Column -->
+        <div class="col">
+            <h5>Permissions</h5>
+            <div class="form-group form-check mt-4">
+                {{ form.is_active(class="form-check-input") }}
+                {{ form.is_active.label(class="form-check-label") }}
+            </div>
+        </div>
+
+        <!-- Password Update Column -->
+        <div class="col">
+            <h5>Password</h5>
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+                <small class="form-text text-muted">Leave blank to keep the current password</small>
+            </div>
+            <div class="form-group">
+                {{ form.confirm_password.label(class="form-label") }}
+                {{ form.confirm_password(class="form-control") }}
+            </div>
+        </div>
+    </div>
+
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.getElementById('edit-username').addEventListener('click', function() {
+        var field = document.getElementById('username-field');
+        field.readOnly = false;
+        field.focus();
+        this.style.display = 'none';
+    });
+</script>
+{% endblock %}

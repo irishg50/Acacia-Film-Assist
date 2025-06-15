@@ -1,0 +1,1770 @@
+/* chat.css - Part 1: Layout and Base Styles */
+
+/* Chat Layout */
+.chat-container {
+    height: calc(100vh - 40px - 1rem);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    position: relative;
+    box-sizing: border-box;
+    max-width: 98vw;
+    margin: 0 auto;
+}
+
+.chat-row {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+/* Chat Column Optimization */
+.chat-column {
+    display: flex;
+    flex-direction: column;
+    flex: 3 1 0%;
+    min-height: 0;
+    height: 100%;
+}
+
+/* Input Column Optimization */
+.input-column {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 300px; /* Fixed width instead of flex: 1 */
+    min-height: 0;
+    overflow-y: auto;
+    padding-left: 0.5rem;
+}
+
+.input-area {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Chat History */
+#chatHistory {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background-color: #ffffff;
+    border: 1px solid #e3e7ee;
+    border-radius: 8px;
+    padding: 0.75rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-history-messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+/* Remove any default margins from the first message */
+.chat-history-messages > *:first-child {
+    margin-top: 0 !important;
+}
+
+/* Ensure messages don't have extra top margin */
+.message {
+    margin: 0 0 8px 0;
+    padding: 6px 10px;
+    border-radius: 12px;
+    max-width: 90%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    position: relative;
+    font-weight: 400;
+    animation: messageIn 0.3s ease;
+}
+
+/* Ensure the last message doesn't have bottom margin */
+.message:last-child {
+    margin-bottom: 0;
+}
+
+.user-message {
+    background-color: #e3f2fd;
+    color: #212529;
+    margin-left: auto;
+    margin-right: 0;
+    font-weight: 400;
+}
+
+.ai-message {
+    background-color: #ffffff;
+    color: #212529;
+    margin: 4px 0;
+    padding: 8px;
+    padding-bottom: 8px;
+    font-weight: 400;
+    border: 1px solid #e3e7ee;
+}
+
+/* Chat Prompt Area */
+.chat-prompt-area {
+    flex-shrink: 0;
+    background: #fff;
+    margin-top: 0 !important;
+    /* Optionally add a border-top or shadow for separation */
+    /* border-top: 1px solid #e3e7ee; */
+    /* box-shadow: 0 -2px 10px rgba(0,0,0,0.05); */
+}
+
+#prompt {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    min-height: 38px;
+    max-height: 180px;
+    resize: vertical;
+    font-size: 1rem;
+    background: #f8fafc;
+    box-shadow: none;
+    transition: border-color 0.2s;
+}
+
+#prompt:focus {
+    border-color: #7abaff;
+    background: #fff;
+    outline: none;
+}
+
+/* chat.css - Part 2: Message Styles */
+
+/* Messages */
+.user-message {
+    background-color: #e3f2fd;
+    color: #212529;
+    margin-left: auto;
+    margin-right: 0;
+    font-weight: 400;
+}
+
+.ai-message {
+    background-color: #ffffff;
+    color: #212529;
+    margin: 4px 0;
+    padding: 8px;
+    padding-bottom: 8px;
+    font-weight: 400;
+    border: 1px solid #e3e7ee;
+}
+
+/* Add padding only when there's a copy button */
+.ai-message:not(.welcome-message) {
+    padding-bottom: 30px; /* Extra space only for messages with copy button */
+}
+
+.ai-message p {
+    margin: 2px 0;
+}
+
+.ai-message h1,
+.ai-message h2,
+.ai-message h3,
+.ai-message h4,
+.ai-message h5,
+.ai-message h6 {
+    margin-top: 0.5em;
+    margin-bottom: 0.2em;
+    line-height: 1.2;
+}
+
+.ai-message h1:first-child,
+.ai-message h2:first-child,
+.ai-message h3:first-child,
+.ai-message h4:first-child,
+.ai-message h5:first-child,
+.ai-message h6:first-child {
+    margin-top: 0;
+}
+
+.ai-message li p {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+}
+
+.ai-message ul,
+.ai-message ol,
+.ai-message li {
+    line-height: 1.25 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.ai-message ul,
+.ai-message ol {
+    padding-left: 1.2em !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    list-style-position: inside !important;
+}
+
+/* Update heading sizes to be between the previous large and small sizes */
+.ai-message h1 {
+    font-size: 1.5rem;  /* Increased from 1.3rem */
+}
+
+.ai-message h2 {
+    font-size: 1.3rem;  /* Increased from 1.1rem */
+}
+
+.ai-message h3 {
+    font-size: 1.15rem; /* Increased from 1rem */
+}
+
+.ai-message h4 {
+    font-size: 1.05rem; /* Increased from 0.95rem */
+}
+
+/* If it's the first heading in the message, remove top margin */
+.ai-message h1:first-child,
+.ai-message h2:first-child,
+.ai-message h3:first-child,
+.ai-message h4:first-child {
+    margin-top: 0;
+}
+
+.ai-message blockquote {
+    margin: 4px 0;
+    padding-left: 8px;
+    border-left: 2px solid #e9ecef;
+}
+
+.ai-message pre {
+    margin: 4px 0;
+    padding: 4px;
+    background-color: #f8f9fa;
+}
+
+.ai-message code {
+    padding: 1px 3px;
+    background-color: #f8f9fa;
+    border-radius: 2px;
+    font-size: 0.9em;
+}
+
+/* Update system message styles to be more subtle */
+.system-message {
+    background-color: #f8f9fa;  /* Light gray instead of yellow */
+    border: none;
+    color: #6c757d;  /* Muted text color */
+    margin: 4px auto;  /* Reduced margin */
+    text-align: center;
+    font-style: normal;
+    width: 90%;
+    padding: 4px 8px;
+    font-size: 0.9em;
+}
+
+/* Remove the progress-specific styling since we don't need it */
+.system-message.progress {
+    display: none;
+}
+
+/* chat.css - Part 3: Copy Button and File Upload Styles */
+
+/* Copy Button */
+.copy-button {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    background-color: #f0f0f0; /* Light grey background */
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    color: #666666; /* Darker grey text */
+    opacity: 1;
+    transform: none;
+}
+
+.copy-button:hover {
+    background-color: #e0e0e0; /* Slightly darker on hover */
+    border-color: #ccc;
+    color: #444444; /* Even darker text on hover */
+}
+
+.copy-button.copied {
+    background-color: #198754;
+    color: #ffffff;
+    border-color: #198754;
+}
+
+.ai-message .copy-button {
+    position: absolute !important;
+    bottom: 8px !important;
+    right: 10px !important;
+    background-color: #f0f0f0 !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    transition: all 0.2s ease !important;
+    color: #666666 !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.ai-message .copy-button:hover {
+    background-color: #e0e0e0 !important;
+    border-color: #ccc !important;
+    color: #444444 !important;
+}
+
+.ai-message .copy-button.copied {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+    border-color: #198754 !important;
+}
+
+
+.ai-message:hover {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* File Upload Area */
+.upload-section h5 {
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+#uploadedFileList {
+    max-height: 20vh;
+    overflow-y: auto;
+    margin-top: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 4px;
+    background-color: #f8f9fa;
+}
+
+/* chat.css - Part 4: File Item and Progress Styles */
+
+/* File Items */
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.file-item.active {
+    border-color: #0c5460;
+    background-color: #e6f7fa !important;
+    color: #0c5460;
+}
+
+.file-item:hover {
+    border-color: #adb5bd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.file-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Progress Container within File Item */
+.progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background-color: rgba(248, 249, 250, 0.9);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 0.75rem;
+    color: #495057;
+    transition: transform 0.3s ease;
+    transform: translateY(100%);
+}
+
+.file-item:hover .progress-container {
+    transform: translateY(0);
+}
+
+.progress-bar {
+    height: 2px;
+    background-color: #e9ecef;
+    flex-grow: 1;
+    margin-right: 8px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #0dcaf0;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+/* Progress Complete Indicator */
+.progress-complete {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #198754;
+    font-size: 1.1rem;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* chat.css - Part 5: File Type Indicators and Animations */
+
+/* File Type Indicators */
+.file-type-icon {
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 1.2rem;
+}
+
+.file-name {
+    flex: 1;
+    margin-right: 8px;
+    color: #495057;
+    overflow-wrap: break-word;    /* Enable word wrapping */
+    word-wrap: break-word;        /* Legacy support */
+    word-break: break-word;       /* Allow breaking of long words */
+    white-space: normal;          /* Changed from nowrap */
+    min-width: 0;                 /* Allows flex item to shrink below content size */
+    line-height: 1.2;             /* Tighter line height for wrapped text */
+    padding: 2px 0;               /* Small padding for better readability */
+}
+
+.file-type-badge {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    text-transform: uppercase;
+}
+
+.file-type-badge.data {
+    background-color: #cff4fc;
+    color: #055160;
+}
+
+.file-type-badge.document {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+.file-details {
+    color: #666;
+    font-size: 0.9em;
+    margin-right: 8px;
+}
+
+.delete-file-button {
+    padding: 4px 8px;
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+}
+
+.delete-file-button:hover {
+    color: #c82333;
+}
+
+/* Data file specific styling */
+.file-item[data-type="csv"],
+.file-item[data-type="xlsx"] {
+    background-color: #e8f4f8;
+    border-left: 3px solid #0dcaf0;
+}
+
+/* Processing status */
+.processing-status {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #e8f4f8;
+    border-radius: 4px;
+    margin-top: 8px;
+    font-size: 0.875rem;
+    color: #055160;
+}
+
+
+/* Previous Chats */
+
+/* Previous Chats */
+#previousChats {
+    border-radius: 4px;
+    margin-bottom: 4px;
+    background: #fff;
+    min-height: 0;
+}
+
+/* Optional: Add a nice scrollbar style */
+#previousChats::-webkit-scrollbar {
+    width: 6px;
+}
+
+#previousChats::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#previousChats::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+#previousChats::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+.chat-sidebar {
+    width: 250px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+}
+
+.chat-list {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+.chat-preview {
+    padding: 8px 4px;
+    border-bottom: 1px solid #dee2e6;
+    cursor: pointer;
+}
+
+.chat-preview-content {
+    flex: 1;
+    min-width: 0; /* Important for text wrapping in flex containers */
+    padding-right: 0.5rem; /* Space for action buttons */
+}
+
+.chat-preview:hover {
+    background: #e9ecef;
+}
+
+.chat-text {
+    word-break: break-word; /* Allow breaking of long words */
+    white-space: normal; /* Allow wrapping */
+    overflow-wrap: break-word;
+}
+
+.chat-header {
+    margin-bottom: 0.25rem;
+}
+
+.chat-actions {
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    opacity: 1; /* Change from 0 to 1 to make always visible */
+    transition: opacity 0.2s;
+}
+
+/* Remove or modify the hover state since we want buttons always visible */
+.chat-item:hover .chat-actions {
+    opacity: 1;
+}
+
+/* Input Area Optimization */
+.chat-input-area {
+    margin-bottom: 0.5rem; /* Reduced from mb-3 */
+}
+
+/* Style for both action buttons */
+.chat-actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    opacity: 1;  /* Ensure buttons are visible */
+    display: inline-block;  /* Ensure proper display */
+}
+
+/* Add some more specific styling for better visibility */
+.chat-actions .btn-link {
+    color: #6c757d;  /* Bootstrap secondary color */
+}
+
+.chat-actions .btn-link:hover {
+    color: #0d6efd;  /* Bootstrap primary color */
+}
+
+.chat-actions .btn-link.text-danger:hover {
+    color: #dc3545 !important;  /* Bootstrap danger color */
+}
+
+/* Specific styles for pin button when active */
+.chat-actions .btn.pinned {
+    color: #0d6efd; /* Bootstrap primary color */
+}
+
+.bi-star-fill {
+    color: #ffc107;
+}
+
+
+
+/* Animations */
+@keyframes messageIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* chat.css - Part 6: Error States and Responsive Design */
+
+/* Error States */
+.error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 8px 0;
+    font-size: 0.875rem;
+}
+
+.system-message.error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Input Area */
+.instruction-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+/* Button group */
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chat-row {
+        flex-direction: column;
+    }
+
+    .chat-column {
+        height: auto;
+        max-height: none;
+    }
+
+    #chatHistory {
+        height: calc(100vh - 300px);
+    }
+
+    .chat-prompt-area {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        z-index: 100;
+    }
+
+    .input-column {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;  /* Important for flex container */
+
+}
+
+    #uploadedFileList {
+        max-height: 15vh;
+    }
+
+    .file-item {
+        font-size: 0.8rem;
+    }
+
+.message {
+    margin: 10px 0;
+    padding: 10px 15px;
+    border-radius: 15px;
+    max-width: 85%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    position: relative;
+    animation: messageIn 0.3s ease;
+}
+
+    .progress-container {
+        height: 20px;
+        padding: 0 8px;
+    }
+
+    .file-type-icon {
+        font-size: 1rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+
+.processing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: #e8f4f8;
+    border: 1px solid #0dcaf0;
+    border-radius: 8px;
+    color: #055160;
+    margin: 10px auto;
+    width: 90%;
+    animation: pulse 2s infinite;
+}
+
+.processing-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #0dcaf0;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+.processing-text {
+    font-size: 0.9rem;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { background-color: #e8f4f8; }
+    50% { background-color: #d1ebf3; }
+    100% { background-color: #e8f4f8; }
+}
+
+/* Project Selection Area */
+.project-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+}
+
+.project-section {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+    margin-bottom: 0.5rem; /* Reduced from mb-3 */
+    padding-bottom: 0.5rem; /* Reduced from 1rem */
+}
+
+
+.documents-section {
+    flex-shrink: 0; /* Don't allow shrinking */
+    margin-bottom: 0.5rem; /* Reduced from mb-3 */
+}
+
+.chats-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Important for nested flex scrolling */
+}
+
+.document-list {
+    margin-bottom: 1rem;
+}
+
+#projectSelect {
+    flex: 1;
+    min-width: 200px;
+}
+
+.project-header .btn {
+    white-space: nowrap;
+}
+
+/* Project Modal */
+.modal-body .form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.modal-body .form-control {
+    border: 1px solid #ced4da;
+}
+
+.modal-body .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Project selection when no project is selected */
+#projectSelect option[disabled] {
+    color: #6c757d;
+}
+
+/* Empty project state */
+.no-project-message {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+/* Document Selection Styles */
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.file-item.active {
+    border-color: #0c5460;
+    background-color: #e6f7fa !important;
+    color: #0c5460;
+}
+
+.file-item:hover {
+    border-color: #adb5bd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.file-item:last-child {
+    margin-bottom: 0;
+}
+
+.document-selection button {
+    color: #0d6efd;
+    font-size: 0.8rem;
+    text-decoration: none;
+    padding: 0;
+}
+
+.document-selection button:hover {
+    text-decoration: underline;
+}
+
+.document-toggle {
+    cursor: pointer;
+}
+
+.document-toggle:checked + label {
+    font-weight: 500;
+}
+
+/* File Details */
+.file-type-icon {
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 1.2rem;
+}
+
+#docCountDisplay {
+    color: #0d6efd;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.document-selection {
+    margin-bottom: 0.5rem;
+}
+
+.document-selection h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.5rem;
+}
+
+/* Additional compact styling for markdown content */
+.markdown-content {
+    font-size: 14px;    /* Slightly smaller font size */
+}
+
+.markdown-content > *:first-child {
+    margin-top: 0;      /* Remove top margin from first element */
+}
+
+.markdown-content > *:last-child {
+    margin-bottom: 0;   /* Remove bottom margin from last element */
+}
+
+/* Override any Bootstrap spacing that might be affecting the content */
+.markdown-content .container,
+.markdown-content .row,
+.markdown-content .col {
+    padding: 0;
+    margin: 0;
+}
+
+/* --- Markdown and AI Message Heading Spacing FINAL OVERRIDE --- */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.ai-message h1,
+.ai-message h2,
+.ai-message h3,
+.ai-message h4 {
+    margin-top: 0.18em !important;
+    margin-bottom: 0.38em !important;
+    line-height: 1.28 !important;
+}
+
+.markdown-content h1:first-child,
+.markdown-content h2:first-child,
+.markdown-content h3:first-child,
+.markdown-content h4:first-child,
+.ai-message h1:first-child,
+.ai-message h2:first-child,
+.ai-message h3:first-child,
+.ai-message h4:first-child {
+    margin-top: 0 !important;
+}
+
+.markdown-content h1:last-child,
+.markdown-content h2:last-child,
+.markdown-content h3:last-child,
+.markdown-content h4:last-child,
+.ai-message h1:last-child,
+.ai-message h2:last-child,
+.ai-message h3:last-child,
+.ai-message h4:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Compact lists */
+.markdown-content ul,
+.markdown-content ol,
+.ai-message ul,
+.ai-message ol {
+    margin-top: 0.12em !important;
+    margin-bottom: 0.12em !important;
+    padding-left: 1.2em !important;
+}
+
+.markdown-content li,
+.ai-message li {
+    margin-bottom: 0.08em !important;
+    line-height: 1.45 !important;
+}
+
+.markdown-content li:last-child,
+.ai-message li:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Remove extra margin after lists */
+.markdown-content ul:last-child,
+.markdown-content ol:last-child,
+.ai-message ul:last-child,
+.ai-message ol:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Update document section styles */
+.documents-section h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.5rem;
+}
+
+/* Remove the select/deselect buttons container styles */
+.document-selection .d-flex.justify-content-between {
+    display: none !important;
+}
+
+/* Adjust the container to better handle wrapped content */
+.file-item .form-check {
+    width: 100%;              /* Ensure the container takes full width */
+    min-width: 0;            /* Allow container to shrink */
+    padding-right: 24px;     /* Make room for delete button */
+}
+
+/* Add this new style */
+.ai-message.welcome-message {
+    margin-top: 0 !important;
+    margin-bottom: 0.5rem !important;
+    order: -1;
+}
+
+.ai-message.welcome-message > *:first-child {
+    margin-bottom: 0.2rem !important;
+}
+
+.ai-message.welcome-message > *:not(.suggested-questions) {
+    margin-bottom: 0.1rem !important;
+    padding-bottom: 0 !important;
+}
+
+.suggested-questions {
+    margin-top: 0.5rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.75rem !important;
+    justify-content: flex-start !important;
+}
+
+.ai-message.welcome-message > *:not(.suggested-questions) {
+    margin-bottom: 0.05rem !important;
+    padding-bottom: 0 !important;
+}
+
+/* --- Login Page Styles --- */
+.login-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+    padding: 2.5rem 2rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-container img {
+    margin-bottom: 1.5rem;
+    max-width: 140px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.login-container h5 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #1a4c5e;
+    text-align: center;
+}
+
+.login-container form {
+    width: 100%;
+}
+
+.login-container .form-label {
+    font-weight: 500;
+    color: #1a4c5e;
+}
+
+.login-container .form-control {
+    border-radius: 8px;
+    border: 1px solid #bcd0e0;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    padding: 0.7rem 1rem;
+}
+
+.login-container .btn-primary {
+    background: #1ec6b6;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.login-container .btn-primary:hover {
+    background: #159e8c;
+}
+
+/* Unified Chat History + Prompt Area */
+.chat-history-unified {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.chat-history-messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.chat-history-prompt {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    padding: 0.5rem 0.75rem 0.25rem 0.75rem;
+    margin-bottom: 0;
+}
+
+#prompt {
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    min-height: 38px;
+    max-height: 180px;
+    resize: vertical;
+    font-size: 1rem;
+    background: #f8fafc;
+    box-shadow: none;
+    transition: border-color 0.2s;
+}
+#prompt:focus {
+    border-color: #7abaff;
+    background: #fff;
+    outline: none;
+}
+
+/* Make sure the chat area fills the available space */
+.chat-column {
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+    min-height: 0;
+    height: 100%;
+}
+
+/* Make chat messages look good in the new container */
+#chatHistory .message {
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .chat-history-unified {
+        border-radius: 10px;
+        padding: 0.25rem 0.25rem 0.5rem 0.25rem;
+    }
+    .chat-history-prompt {
+        border-radius: 8px;
+        padding: 0.25rem 0.5rem 0.15rem 0.5rem;
+    }
+    #prompt {
+        font-size: 0.95rem;
+    }
+}
+
+/* Quick Upload Button */
+.quick-upload-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    border-radius: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+.active-doc-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+    min-height: 28px;
+}
+.active-doc-btn {
+    background: #fff;
+    color: #0c5460;
+    border: 1.5px solid #0c5460;
+    border-radius: 16px;
+    padding: 2px 24px 2px 10px;
+    font-size: 0.92em;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    transition: background 0.2s, border 0.2s, color 0.2s;
+    cursor: pointer;
+}
+.active-doc-btn:hover {
+    background: #e7f1ff;
+    border-color: #159e8c;
+    color: #159e8c;
+}
+.remove-doc-x {
+    display: none;
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 1.1em;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+.active-doc-btn:hover .remove-doc-x {
+    display: inline;
+}
+
+.add-documents-area {
+    display: none !important;
+}
+
+.project-switcher-section {
+    background: #f7f7fa;
+    border-radius: 8px;
+    padding: 16px 12px 12px 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.project-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.project-title-select {
+    font-size: 1.15em;
+    font-weight: bold;
+    background: #0c5460;
+    color: #fff;
+    border: 2px solid #1ec6b6;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 0.5em;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.project-title-select:focus {
+    outline: 2px solid #1ec6b6;
+}
+.project-title-select option {
+    font-size: 0.98em;
+    font-weight: 500;
+    color: #222;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    line-height: 1.3;
+}
+
+.project-switcher-section,
+.documents-section,
+.chats-section {
+    font-size: 1rem !important;
+}
+
+.project-switcher-section .btn-primary,
+.documents-section .btn-primary,
+.chats-section .btn-primary {
+    font-size: 0.95rem !important;
+    font-family: inherit !important;
+    font-weight: 300 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+    background: #1ec6b6 !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-switcher-section .btn-primary:hover,
+.documents-section .btn-primary:hover,
+.chats-section .btn-primary:hover,
+.project-switcher-section .btn-primary:focus,
+.documents-section .btn-primary:focus,
+.chats-section .btn-primary:focus {
+    background: #159e8c !important;
+    color: #fff !important;
+}
+
+/* Suggested Questions Styles */
+.suggested-questions {
+    margin-top: 0.5rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.75rem !important;
+    justify-content: flex-start !important;
+}
+
+.ai-message.welcome-message {
+    margin-top: 0 !important;
+    margin-bottom: 0.5rem !important;
+    order: -1;
+}
+
+.ai-message.welcome-message > *:first-child {
+    margin-bottom: 0.2rem !important;
+}
+
+.ai-message.welcome-message > *:not(.suggested-questions) {
+    margin-bottom: 0.1rem !important;
+    padding-bottom: 0 !important;
+}
+
+.suggested-question {
+    background: transparent !important;
+    border: 1.5px solid #1ec6b6 !important;
+    color: #1ec6b6 !important;
+    border-radius: 18px !important;
+    padding: 0.4rem 1.2rem !important;
+    font-size: 0.97rem !important;
+    cursor: pointer !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+    box-shadow: none !important;
+    outline: none !important;
+    width: auto !important;
+    max-width: 400px !important;
+    text-align: center !important;
+}
+
+.suggested-question:hover,
+.suggested-question:focus {
+    background: #e6f7fa !important;
+    color: #159a8c !important;
+    border-color: #159a8c !important;
+}
+
+/* --- Markdown and AI Message Improvements --- */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.ai-message h1,
+.ai-message h2,
+.ai-message h3,
+.ai-message h4 {
+    margin-top: 0.25em !important;
+    margin-bottom: 0.35em !important;
+    line-height: 1.28 !important;
+}
+
+.markdown-content h1:first-child,
+.markdown-content h2:first-child,
+.markdown-content h3:first-child,
+.markdown-content h4:first-child,
+.ai-message h1:first-child,
+.ai-message h2:first-child,
+.ai-message h3:first-child,
+.ai-message h4:first-child {
+    margin-top: 0 !important;
+}
+
+.markdown-content h1:last-child,
+.markdown-content h2:last-child,
+.markdown-content h3:last-child,
+.markdown-content h4:last-child,
+.ai-message h1:last-child,
+.ai-message h2:last-child,
+.ai-message h3:last-child,
+.ai-message h4:last-child {
+    margin-bottom: 0 !important;
+}
+
+.markdown-content ul,
+.markdown-content ol,
+.ai-message ul,
+.ai-message ol {
+    padding-left: 1.3em;
+    margin: 0.2em 0 0.2em 0;
+    line-height: 1.5 !important;
+}
+
+.markdown-content li,
+.ai-message li {
+    margin-bottom: 0.18em;
+    line-height: 1.5 !important;
+}
+
+.markdown-content li:last-child,
+.ai-message li:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-content p,
+.ai-message p {
+    margin: 0.18em 0;
+    line-height: 1.5;
+}
+
+/* --- FINAL: Compact, Readable Markdown & AI Message Styles --- */
+.markdown-content,
+.ai-message {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.ai-message h1,
+.ai-message h2,
+.ai-message h3,
+.ai-message h4 {
+    margin-top: 0.18em !important;
+    margin-bottom: 0.28em !important;
+    line-height: 1.22 !important;
+}
+
+.markdown-content h1:first-child,
+.markdown-content h2:first-child,
+.markdown-content h3:first-child,
+.markdown-content h4:first-child,
+.ai-message h1:first-child,
+.ai-message h2:first-child,
+.ai-message h3:first-child,
+.ai-message h4:first-child {
+    margin-top: 0 !important;
+}
+
+.markdown-content h1:last-child,
+.markdown-content h2:last-child,
+.markdown-content h3:last-child,
+.markdown-content h4:last-child,
+.ai-message h1:last-child,
+.ai-message h2:last-child,
+.ai-message h3:last-child,
+.ai-message h4:last-child {
+    margin-bottom: 0 !important;
+}
+
+.markdown-content ul,
+.markdown-content ol,
+.ai-message ul,
+.ai-message ol {
+    margin-top: 0.08em !important;
+    margin-bottom: 0.08em !important;
+    padding-left: 1.1em !important;
+}
+
+.markdown-content li,
+.ai-message li {
+    margin-bottom: 0.08em !important;
+    line-height: 1.45 !important;
+}
+
+.markdown-content li:last-child,
+.ai-message li:last-child {
+    margin-bottom: 0 !important;
+}
+
+.markdown-content ul:last-child,
+.markdown-content ol:last-child,
+.ai-message ul:last-child,
+.ai-message ol:last-child {
+    margin-bottom: 0 !important;
+}
+
+.markdown-content p,
+.ai-message p {
+    margin: 0.12em 0 !important;
+    line-height: 1.5 !important;
+}
+
+/* --- FINAL: Compact Markdown & AI Message Spacing --- */
+.ai-message *:not(code):not(pre),
+.markdown-content *:not(code):not(pre) {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.ai-message,
+.markdown-content {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.ai-message h1, .ai-message h2, .ai-message h3, .ai-message h4,
+.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 {
+    margin: 0.18em 0 0.22em 0 !important;
+    line-height: 1.22 !important;
+}
+
+.ai-message ul, .ai-message ol,
+.markdown-content ul, .markdown-content ol {
+    margin: 0.1em 0 !important;
+    padding-left: 1.1em !important;
+    list-style-position: inside !important;
+}
+
+.ai-message li, .markdown-content li {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.45 !important;
+}
+
+.ai-message li > p, .markdown-content li > p {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+}
+
+.ai-message ul:last-child, .ai-message ol:last-child,
+.markdown-content ul:last-child, .markdown-content ol:last-child {
+    margin-bottom: 0 !important;
+}
+
+.ai-message p, .markdown-content p {
+    margin: 0.12em 0 !important;
+    line-height: 1.5 !important;
+}
+
+/* --- BULLETPROOF: Remove all extra space in markdown/AI lists --- */
+.ai-message *:not(.copy-button):not(.suggested-questions),
+.markdown-content *:not(.copy-button):not(.suggested-questions) {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* --- ULTIMATE: Remove all extra space in markdown/AI lists, even with <li><p> --- */
+.ai-message li > p,
+.markdown-content li > p {
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: inherit !important;
+}
+
+.ai-message li,
+.markdown-content li {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.45 !important;
+}
+
+.ai-message ul, .ai-message ol,
+.markdown-content ul, .markdown-content ol {
+    margin: 0.1em 0 !important;
+    padding-left: 1.1em !important;
+    list-style-position: inside !important;
+}
+
+.ai-message ul:last-child, .ai-message ol:last-child,
+.markdown-content ul:last-child, .markdown-content ol:last-child {
+    margin-bottom: 0 !important;
+}
+
+.ai-message p, .markdown-content p {
+    margin: 0.12em 0 !important;
+    line-height: 1.5 !important;
+}
+
+/* --- SURGICAL: Remove all margin/padding from markdown/AI lists and items --- */
+.ai-message ul, .ai-message ol,
+.markdown-content ul, .markdown-content ol {
+    margin: 0.1em 0 !important;
+    padding-left: 1.1em !important;
+    list-style-position: inside !important;
+}
+
+.ai-message li, .markdown-content li {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.45 !important;
+}
+
+.ai-message li > strong,
+.markdown-content li > strong {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-weight: 600 !important;
+}
+
+.ai-message li *,
+.markdown-content li * {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.ai-message li::marker,
+.markdown-content li::marker {
+    font-size: 1em !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.ai-message ul:last-child, .ai-message ol:last-child,
+.markdown-content ul:last-child, .markdown-content ol:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* --- FOCUSED LIST AND HEADING SPACING (Attempt X) --- */
+.ai-message ul, .ai-message ol,
+.markdown-content ul, .markdown-content ol {
+    margin-top: 0.2em !important;
+    margin-bottom: 0.2em !important;
+    padding-left: 1.5em !important;
+}
+
+.ai-message li,
+.markdown-content li {
+    margin-bottom: 0.1em !important;
+    padding: 0 !important;
+    line-height: 1.35 !important;
+}
+
+.ai-message li > p,
+.markdown-content li > p {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+}
+
+.ai-message h1, .ai-message h2, .ai-message h3, .ai-message h4,
+.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 {
+    margin-top: 0.4em !important;
+    margin-bottom: 0.15em !important;
+    line-height: 1.2 !important;
+}
+
+/* For paragraphs directly inside .ai-message or .markdown-content, not nested */
+.ai-message > p,
+.markdown-content > p {
+    margin-top: 0em !important;
+    margin-bottom: 0.3em !important;
+}
+
+/* --- AGGRESSIVE COMPACT LIST STYLING --- */
+
+.ai-message,
+.markdown-content {
+    font-size: 14px !important; /* Base font size for content */
+}
+
+/* Headings within AI/Markdown messages */
+.ai-message h1, .ai-message h2, .ai-message h3, .ai-message h4,
+.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4 {
+    margin-top: 0.5em !important;
+    margin-bottom: 0.2em !important;
+    line-height: 1.2 !important;
+}
+
+/* Paragraphs directly under ai-message or markdown-content */
+.ai-message > p,
+.markdown-content > p {
+    margin-top: 0.2em !important;
+    margin-bottom: 0.2em !important;
+    line-height: 1.4 !important;
+}
+
+/* List container (ul/ol) styling */
+.ai-message ul, .ai-message ol,
+.markdown-content ul, .markdown-content ol {
+    margin-top: 0.2em !important;    /* Small space above the list */
+    margin-bottom: 0.2em !important; /* Small space below the list */
+    padding-left: 1.5em !important;  /* Indentation for bullets/numbers */
+    list-style-position: outside !important; /* Ensures markers don't overlap text if padding is tight */
+}
+
+/* List items (li) styling */
+.ai-message li,
+.markdown-content li {
+    margin-bottom: 0.05em !important; /* VERY small space between list items */
+    padding: 0 !important;
+    line-height: 1.3 !important;     /* Tight line height within the list item */
+    list-style-type: disc; /* Explicitly set bullet style */
+}
+.ai-message ol li, 
+.markdown-content ol li {
+    list-style-type: decimal !important; /* Explicitly set number style for ordered lists */
+}
+
+
+/* Target any <p> tags that might appear inside <li> (shouldn't, but defensively) */
+.ai-message li p,
+.markdown-content li p {
+    display: inline !important; /* Force it to behave like inline text */
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: inherit !important; /* Inherit the li's tight line-height */
+}
+
+/* Target <strong> tags inside <li> */
+.ai-message li strong,
+.markdown-content li strong {
+    font-weight: 600 !important; /* Ensure it's bold */
+    margin: 0 !important; /* No extra space around the strong tag */
+    padding: 0 !important;
+}
+
+/* A more general reset for common inline elements if they appear in lists */
+.ai-message li span, .ai-message li em, .ai-message li i, .ai-message li b,
+.markdown-content li span, .markdown-content li em, .markdown-content li i, .markdown-content li b {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: inherit !important;
+}

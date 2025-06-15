@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}API Logs{% endblock %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<h1>API Logs</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Username</th>
+            <th>Thread ID</th>
+            <th>Prompt</th>
+            <th>Prompt Tokens</th>
+            <th>Completion Tokens</th>
+            <th>Cached Tokens</th>
+            <th>Model</th>
+            <th>Estimated Cost ($)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.id }}</td>
+            <td>{{ log.timestamp.strftime('%Y-%m-%d') }}</td>
+            <td>{{ log.username }}</td>
+            <td>{{ log.thread_id[-6:] if log.thread_id else '' }}</td>
+            <td>{{ log.prompt[:150] + '...' if log.prompt|length > 150 else log.prompt }}</td>
+            <td>{{ log.prompt_tokens }}</td>
+            <td>{{ log.completion_tokens }}</td>
+            <td>{{ log.cache_tokens }}</td>
+            <td>{{ log.model }}</td>
+            <td class="tooltip">${{ "%.2f"|format(log.estimated_cost) }}
+                <span class="tooltiptext">{{ log.cost_details }}</span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
