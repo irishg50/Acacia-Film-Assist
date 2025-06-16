@@ -313,7 +313,7 @@ def new_chat():
         static_question = "What were we discussing recently?"
         
         # Create personalized welcome message
-        welcome_message = f"""<img src='{url_for('static', filename='img/MONT-E_1_sq.png')}' alt='MONT-E Icon' style='height: 2em; width: 2em; border-radius: 50%; vertical-align: middle; margin-right: 0.5em;'> <b>Hi there!</b> I'm MONT-E, your intelligent production assistant. What can I help you with?
+        welcome_message = f"""<img src='{url_for('static', filename='img/ACACIA_sq.png')}' alt='ACACIA Icon' style='height: 2em; width: 2em; border-radius: 50%; vertical-align: middle; margin-right: 0.5em;'> <b>Hi there!</b> I'm ACACIA, your intelligent production assistant. What can I help you with?
 
 <div class=\"suggested-questions\">\n    <button class=\"suggested-question\" onclick=\"submitSuggestedQuestion('{random_selected_questions[0]}')\">{random_selected_questions[0]}</button>\n    <button class=\"suggested-question\" onclick=\"submitSuggestedQuestion('{random_selected_questions[1]}')\">{random_selected_questions[1]}</button>\n    <button class=\"suggested-question\" onclick=\"submitSuggestedQuestion('{static_question}')\">{static_question}</button>\n</div>"""
 
@@ -591,6 +591,30 @@ Do not repeat or summarize previous questions and answers from the current sessi
                 f"\n{user_background}\n"
                 "==== END OF USER PROFILE CONTEXT ====\n\n"
             )
+
+        # Add research capability instructions
+        system_prompt_full += """
+You have access to a research tool powered by Perplexity AI that can help with documentary research. 
+When a user asks for research on a topic, you should:
+
+1. Identify if the request requires research (e.g., "research about X", "find information on Y", "what do we know about Z")
+2. If research is needed, respond with a special format:
+   [RESEARCH_REQUEST]
+   topic: [the topic to research]
+   focus_areas: [optional list of specific aspects to focus on]
+   [/RESEARCH_REQUEST]
+
+3. After receiving research results, synthesize them into a clear, documentary-focused response that includes:
+   - Key historical context
+   - Main figures or subjects
+   - Current relevance
+   - Potential visual elements
+   - Notable controversies
+   - Related documentary films
+
+Remember to maintain your role as a documentary production assistant while incorporating research findings.
+"""
+
         system_prompt_full += system_prompt
 
         provider = current_app.config.get('MODEL_PROVIDER', 'anthropic')

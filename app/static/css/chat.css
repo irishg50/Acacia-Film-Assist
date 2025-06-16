@@ -96,21 +96,21 @@
 }
 
 .user-message {
-    background-color: #e3f2fd;
-    color: #212529;
+    background-color: #fbbf24;
+    color: #6b3f1d;
     margin-left: auto;
     margin-right: 0;
     font-weight: 400;
 }
 
 .ai-message {
-    background-color: #ffffff;
-    color: #212529;
+    background-color: #fff7ed;
+    color: #6b3f1d;
     margin: 4px 0;
     padding: 8px;
     padding-bottom: 8px;
     font-weight: 400;
-    border: 1px solid #e3e7ee;
+    border: none;
 }
 
 /* Chat Prompt Area */
@@ -145,21 +145,21 @@
 
 /* Messages */
 .user-message {
-    background-color: #e3f2fd;
-    color: #212529;
+    background-color: #fbbf24;
+    color: #6b3f1d;
     margin-left: auto;
     margin-right: 0;
     font-weight: 400;
 }
 
 .ai-message {
-    background-color: #ffffff;
-    color: #212529;
+    background-color: #fff7ed;
+    color: #6b3f1d;
     margin: 4px 0;
     padding: 8px;
     padding-bottom: 8px;
     font-weight: 400;
-    border: 1px solid #e3e7ee;
+    border: none;
 }
 
 /* Add padding only when there's a copy button */
@@ -282,8 +282,8 @@
     position: absolute;
     bottom: 8px;
     right: 10px;
-    background-color: #f0f0f0; /* Light grey background */
-    border: 1px solid #dee2e6;
+    background-color: #fbbf24;
+    border: 1px solid #b45309;
     border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
@@ -292,29 +292,29 @@
     align-items: center;
     gap: 4px;
     transition: all 0.2s ease;
-    color: #666666; /* Darker grey text */
+    color: #6b3f1d;
     opacity: 1;
     transform: none;
 }
 
 .copy-button:hover {
-    background-color: #e0e0e0; /* Slightly darker on hover */
-    border-color: #ccc;
-    color: #444444; /* Even darker text on hover */
+    background-color: #f59e42;
+    border-color: #b45309;
+    color: #fff;
 }
 
 .copy-button.copied {
-    background-color: #198754;
-    color: #ffffff;
-    border-color: #198754;
+    background-color: #d97706;
+    color: #fff;
+    border-color: #d97706;
 }
 
 .ai-message .copy-button {
     position: absolute !important;
     bottom: 8px !important;
     right: 10px !important;
-    background-color: #f0f0f0 !important;
-    border: 1px solid #dee2e6 !important;
+    background-color: #e5e7eb !important;
+    border: 1px solid #bdbdbd !important;
     border-radius: 4px !important;
     padding: 4px 8px !important;
     font-size: 12px !important;
@@ -323,21 +323,21 @@
     align-items: center !important;
     gap: 4px !important;
     transition: all 0.2s ease !important;
-    color: #666666 !important;
+    color: #495057 !important;
     opacity: 1 !important;
     transform: none !important;
 }
 
 .ai-message .copy-button:hover {
-    background-color: #e0e0e0 !important;
-    border-color: #ccc !important;
-    color: #444444 !important;
+    background-color: #f59e42 !important;
+    border-color: #b45309 !important;
+    color: #fff !important;
 }
 
 .ai-message .copy-button.copied {
-    background-color: #198754 !important;
-    color: #ffffff !important;
-    border-color: #198754 !important;
+    background-color: #d97706 !important;
+    color: #fff !important;
+    border-color: #d97706 !important;
 }
 
 
@@ -379,9 +379,9 @@
 }
 
 .file-item.active {
-    border-color: #0c5460;
-    background-color: #e6f7fa !important;
-    color: #0c5460;
+    border-color: #d97706;
+    background-color: #fbbf24 !important;
+    color: #6b3f1d;
 }
 
 .file-item:hover {
@@ -893,9 +893,9 @@
 }
 
 .file-item.active {
-    border-color: #0c5460;
-    background-color: #e6f7fa !important;
-    color: #0c5460;
+    border-color: #d97706;
+    background-color: #fbbf24 !important;
+    color: #6b3f1d;
 }
 
 .file-item:hover {
@@ -1231,9 +1231,9 @@
     min-height: 28px;
 }
 .active-doc-btn {
-    background: #fff;
-    color: #0c5460;
-    border: 1.5px solid #0c5460;
+    background: #fff7ed;
+    color: #d97706;
+    border: 1.5px solid #d97706;
     border-radius: 16px;
     padding: 2px 24px 2px 10px;
     font-size: 0.92em;
@@ -1246,9 +1246,9 @@
     cursor: pointer;
 }
 .active-doc-btn:hover {
-    background: #e7f1ff;
-    border-color: #159e8c;
-    color: #159e8c;
+    background: #fbbf24;
+    border-color: #b45309;
+    color: #b45309;
 }
 .remove-doc-x {
     display: none;
@@ -1272,11 +1272,29 @@
 }
 
 .project-switcher-section {
-    background: #f7f7fa;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #6b3f1d;
     border-radius: 8px;
-    padding: 16px 12px 12px 12px;
+    padding: 6px 12px 4px 12px;
     margin-bottom: 16px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.project-label {
+    margin-bottom: 0;
+    min-width: 120px;
+}
+
+.project-switcher-section > div[style*='position: relative'] {
+    flex: 1;
+    margin-top: 0 !important;
+}
+
+.project-switcher-section .d-flex {
+    margin-top: 0 !important;
+    gap: 0.5rem;
 }
 
 .project-title {
@@ -1286,11 +1304,9 @@
 }
 
 .project-title-select {
-    font-size: 1.15em;
-    font-weight: bold;
-    background: #0c5460;
-    color: #fff;
-    border: 2px solid #1ec6b6;
+    background: #fff7ed;
+    color: #b45309;
+    border: 2px solid #d97706;
     border-radius: 8px;
     padding: 8px 12px;
     margin-bottom: 0.5em;
@@ -1302,7 +1318,7 @@
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .project-title-select:focus {
-    outline: 2px solid #1ec6b6;
+    outline: 2px solid #fbbf24;
 }
 .project-title-select option {
     font-size: 0.98em;
@@ -1328,7 +1344,7 @@
     padding: 0.5rem 1.25rem !important;
     border-radius: 8px !important;
     color: #fff !important;
-    background: #1ec6b6 !important;
+    background: #d97706 !important;
     border: none !important;
     box-shadow: none !important;
     transition: background 0.2s, color 0.2s;
@@ -1343,7 +1359,7 @@
 .project-switcher-section .btn-primary:focus,
 .documents-section .btn-primary:focus,
 .chats-section .btn-primary:focus {
-    background: #159e8c !important;
+    background: #b45309 !important;
     color: #fff !important;
 }
 
@@ -1373,8 +1389,8 @@
 
 .suggested-question {
     background: transparent !important;
-    border: 1.5px solid #1ec6b6 !important;
-    color: #1ec6b6 !important;
+    border: 1.5px solid #d97706 !important;
+    color: #b45309 !important;
     border-radius: 18px !important;
     padding: 0.4rem 1.2rem !important;
     font-size: 0.97rem !important;
@@ -1389,9 +1405,9 @@
 
 .suggested-question:hover,
 .suggested-question:focus {
-    background: #e6f7fa !important;
-    color: #159a8c !important;
-    border-color: #159a8c !important;
+    background: #fbbf24 !important;
+    color: #6b3f1d !important;
+    border-color: #b45309 !important;
 }
 
 /* --- Markdown and AI Message Improvements --- */
@@ -1767,4 +1783,59 @@
     margin: 0 !important;
     padding: 0 !important;
     line-height: inherit !important;
+}
+
+@media (max-width: 768px) {
+    .project-switcher-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    .project-switcher-section > div[style*='position: relative'] {
+        width: 100%;
+    }
+}
+
+.input-column .nav-tabs {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e3e7ee;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+.input-column .nav-link {
+    padding: 0.3rem 0.7rem 0.3rem 0.7rem;
+    font-size: 0.92rem;
+    margin-bottom: -1px;
+    border-radius: 8px 8px 0 0;
+    background: #f3f4f6;
+    border: 1px solid #e3e7ee;
+    border-bottom: none;
+    color: #b45309;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s, border-bottom 0.2s;
+    white-space: nowrap;
+}
+.input-column .nav-link.active {
+    background: #fff;
+    color: #d97706;
+    font-weight: bold;
+    border-bottom: 3px solid #d97706;
+    z-index: 2;
+}
+.input-column .nav-link:not(.active) {
+    color: #b45309;
+    background: #f3f4f6;
+    font-weight: 500;
+    border-bottom: 1px solid #e3e7ee;
+}
+@media (max-width: 768px) {
+    .input-column .nav-tabs {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .input-column .nav-link {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.9rem;
+    }
 }

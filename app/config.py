@@ -14,7 +14,7 @@ class Config:
     MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024  # 1 MB limit (adjustable)
 
     # Database settings
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://postgres:POST50pat!@localhost/TALE_chat')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://postgres:POST50pat!@localhost/ACACIA_chat')
     if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False

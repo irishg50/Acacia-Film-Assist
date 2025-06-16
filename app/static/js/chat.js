@@ -10,7 +10,7 @@ let deleteModal = null;
 let chatToDelete = null;
 
 const allowedTypes = ['.txt', '.pdf', '.doc', '.docx', '.csv', '.xlsx'];
-const maxFileSize = window.MAX_FILE_SIZE_BYTES || (1 * 1024 * 1024); // 1MB default
+const maxFileSize = window.MAX_FILE_SIZE_BYTES || (10 * 1024 * 1024); // 10MB default
 const maxFiles = 4;
 
 let thinkingInterval = null;
@@ -61,7 +61,7 @@ const documentStore = {
         const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
 
         if (file.size > maxFileSize) {
-            addMessageToChatHistory('System', `Error: ${file.name} exceeds 1MB size limit`);
+            addMessageToChatHistory('System', `Error: ${file.name} exceeds 10MB size limit`);
             return false;
         }
 
@@ -406,6 +406,10 @@ function addMessageToChatHistory(sender, message, isHistoryLoad = false) {
             const suggested = tempDiv.querySelector('.suggested-questions');
             if (suggested) {
                 messageElement.appendChild(suggested);
+                // Attach click handlers to all suggested-question buttons
+                messageElement.querySelectorAll('.suggested-question').forEach(btn => {
+                    btn.onclick = () => submitSuggestedQuestion(btn.textContent.trim());
+                });
             }
             messageElement.classList.add('welcome-message');
             isFirstAIMessage = false;
@@ -537,6 +541,117 @@ function removeThinkingMessage() {
     }
 }
 
+async function handleResearchRequest(topic, focusAreas = []) {
+    if (!currentProject) {
+        addMessageToChatHistory('System', 'Please select a project first.');
+        return;
+    }
+
+    try {
+        addMessageToChatHistory('System', `Researching topic: ${topic}...`);
+        
+        const response = await fetch(`${baseUrl}/api/research`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                topic: topic,
+                focus_areas: focusAreas,
+                project_id: currentProject
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Research request failed');
+        }
+
+        const data = await response.json();
+        
+        // Add research results to chat
+        addMessageToChatHistory('AI', `Here's what I found about ${topic}:\n\n${data.research.content}`);
+        
+        // Add a button to view full research history
+        const historyButton = document.createElement('button');
+        historyButton.className = 'btn btn-sm btn-outline-secondary mt-2';
+        historyButton.textContent = 'View Research History';
+        historyButton.onclick = () => loadResearchHistory();
+        
+        const messageElement = document.querySelector('.ai-message:last-child');
+        if (messageElement) {
+            messageElement.appendChild(historyButton);
+        }
+
+    } catch (error) {
+        console.error('Research error:', error);
+        addMessageToChatHistory('System', `Error during research: ${error.message}`);
+    }
+}
+
+async function loadResearchHistory() {
+    if (!currentProject) return;
+
+    try {
+        const response = await fetch(`${baseUrl}/api/research/history?project_id=${currentProject}`);
+        if (!response.ok) throw new Error('Failed to load research history');
+
+        const data = await response.json();
+        
+        // Create modal to display research history
+        const modalHtml = `
+            <div class="modal fade" id="researchHistoryModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Research History</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="research-history-list">
+                                ${data.research_history.map(item => `
+                                    <div class="research-item p-3 mb-3 border rounded">
+                                        <h6>${item.topic}</h6>
+                                        <div class="text-muted small mb-2">
+                                            ${new Date(item.created_at).toLocaleString()}
+                                        </div>
+                                        <p>${item.preview}</p>
+                                        ${item.focus_areas.length ? `
+                                            <div class="focus-areas">
+                                                <small class="text-muted">Focus areas: ${item.focus_areas.join(', ')}</small>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add modal to document
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHtml;
+        document.body.appendChild(modalContainer);
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('researchHistoryModal'));
+        modal.show();
+
+        // Clean up modal after it's hidden
+        document.getElementById('researchHistoryModal').addEventListener('hidden.bs.modal', function () {
+            this.remove();
+        });
+
+    } catch (error) {
+        console.error('Error loading research history:', error);
+        addMessageToChatHistory('System', 'Error loading research history');
+    }
+}
+
+// Modify the existing sendMessage function to handle research requests
 async function sendMessage(customRequestData = null) {
     if (isProcessing) {
         addMessageToChatHistory('System', 'Please wait for the current message to complete.');
@@ -592,6 +707,9 @@ async function sendMessage(customRequestData = null) {
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
+        let isResearchRequest = false;
+        let researchTopic = '';
+        let researchFocusAreas = [];
 
         while (true) {
             const { done, value } = await reader.read();
@@ -648,6 +766,48 @@ async function sendMessage(customRequestData = null) {
                     console.error('Error parsing JSON:', e);
                 }
             }
+
+            // Check for research request in the response
+            if (buffer.includes('[RESEARCH_REQUEST]')) {
+                isResearchRequest = true;
+                const match = buffer.match(/\[RESEARCH_REQUEST\](.*?)\[\/RESEARCH_REQUEST\]/s);
+                if (match) {
+                    const content = match[1];
+                    const topicMatch = content.match(/topic:\s*(.*?)(?:\n|$)/);
+                    const focusMatch = content.match(/focus_areas:\s*\[(.*?)\]/);
+                    
+                    if (topicMatch) {
+                        researchTopic = topicMatch[1].trim();
+                        if (focusMatch) {
+                            researchFocusAreas = focusMatch[1].split(',').map(area => area.trim());
+                        }
+                        
+                        // Clear the research request from the buffer
+                        buffer = buffer.replace(match[0], '');
+                        
+                        // Handle the research request
+                        await handleResearchRequest(researchTopic, researchFocusAreas);
+                    }
+                }
+            }
+
+            // Process remaining content as normal chat message
+            if (buffer && !isResearchRequest) {
+                try {
+                    const data = JSON.parse(buffer);
+                    if (data.chunk) {
+                        if (!aiMessageElement) {
+                            aiMessageElement = document.createElement('div');
+                            aiMessageElement.className = 'message ai-message';
+                            document.querySelector('#chatHistory .chat-history-messages').appendChild(aiMessageElement);
+                        }
+                        aiMessageElement.innerHTML = marked.parse(buffer);
+                        scrollToBottom();
+                    }
+                } catch (e) {
+                    // Not a complete JSON object yet, continue accumulating
+                }
+            }
         }
     } catch (error) {
         console.error('Error:', error);
@@ -687,17 +847,21 @@ async function loadProjects() {
 
         if (projectSelect) {
             projectSelect.innerHTML = `
-                <option value="" disabled ${!currentProject ? 'selected' : ''}>Select a Project</option>
+                <option value="" disabled ${!currentProject ? 'selected' : ''}>Select a Workspace</option>
                 ${data.projects.map(project => `
                     <option value="${project.id}" ${currentProject == project.id ? 'selected' : ''}>
                         ${project.name}
                     </option>
                 `).join('')}
+                <option value="__add__">➕ Add New Workspace</option>
             `;
 
             projectSelect.onchange = function() {
                 const projectId = this.value;
-                if (projectId) {
+                if (projectId === "__add__") {
+                    createNewProject();
+                    this.value = currentProject; // Reset to current
+                } else if (projectId) {
                     switchProject(projectId);
                 }
             };
@@ -808,6 +972,36 @@ async function switchProject(projectId) {
     ]);
 }
 
+// Helper function for user-friendly relative date
+function getRelativeDateDescription(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    if (diffMs < 0) return 'just now'; // future date fallback
+
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffDays === 0) {
+        if (diffHours === 0) {
+            return 'earlier today';
+        } else {
+            return 'earlier today';
+        }
+    } else if (diffDays === 1) {
+        return 'yesterday';
+    } else if (diffDays < 7) {
+        return `${diffDays} days ago`;
+    } else if (diffDays < 14) {
+        return 'last week';
+    } else {
+        return 'more than a week ago';
+    }
+}
+
+// Replace the date/time in chat history listings with the relative date
 async function loadChatList() {
     if (!currentProject) return;
 
@@ -829,7 +1023,7 @@ async function loadChatList() {
                                 <div class="chat-header d-flex align-items-center">
                                     ${chat.pinned ? '<i class="bi bi-star-fill text-warning me-2"></i>' : ''}
                                     <div class="small text-muted">
-                                        ${new Date(chat.created_at).toLocaleString()}
+                                        ${getRelativeDateDescription(chat.created_at)}
                                     </div>
                                 </div>
                                 <div class="chat-text">
@@ -1108,6 +1302,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Optional: handle file selection
     if (quickFileInput) {
         quickFileInput.addEventListener('change', handleFileUpload);
+    }
+
+    // Show/hide edit pencil icon based on selected workspace
+    const projectSelect = document.getElementById('projectSelect');
+    const editProjectIcon = document.getElementById('editProjectIcon');
+    function updateEditIconVisibility() {
+        if (!projectSelect || !editProjectIcon) return;
+        const val = projectSelect.value;
+        if (val && val !== '__add__') {
+            editProjectIcon.style.display = 'flex';
+        } else {
+            editProjectIcon.style.display = 'none';
+        }
+    }
+    if (projectSelect && editProjectIcon) {
+        projectSelect.addEventListener('change', updateEditIconVisibility);
+        updateEditIconVisibility();
     }
 });
 

@@ -8,6 +8,23 @@
 {% endblock %}
 
 {% block content %}
+<div class="project-switcher-section mb-3" style="background: #f3f4f6;">
+    <div class="project-label" style="font-size: 0.92em; font-weight: 500; opacity: 0.85; color: #6b3f1d;">Current Workspace:</div>
+    <div style="position: relative; margin-top: 0.5em; width: 100%; max-width: 98vw;">
+        <select id="projectSelect" class="project-title-select" style="font-size: 1.1em; font-weight: bold; background: #f3f4f6; color: #6b3f1d; border: 1.5px solid #b45309; border-radius: 10px; padding: 8px 60px 8px 12px; margin-bottom: 0.5em; appearance: none; width: 100%; min-width: 220px;">
+            <option value="" disabled>Change Workspace</option>
+            <!-- Project options will be populated here by JS -->
+            <option value="__add__">➕ Add New Workspace</option>
+        </select>
+        <span style="position: absolute; right: 8px; top: 0; height: 100%; width: 48px; display: flex; align-items: center; pointer-events: none;">
+            <button id="editProjectIcon" title="Edit Workspace" style="background: none; border: none; color: #b45309; cursor: pointer; padding: 0; display: flex; align-items: center; margin-right: 8px; pointer-events: auto;" onclick="editCurrentProject()">
+                <i class="bi bi-pencil" style="font-size: 1.2em;"></i>
+            </button>
+            <span style="font-size: 1.1em; color: #b45309; user-select: none; margin-left: auto;">▼</span>
+        </span>
+    </div>
+</div>
+
 <div class="chat-container">
     <div class="chat-row">
         <!-- Left column - chat area -->
@@ -18,84 +35,74 @@
                 </div>
             </div>
             <div class="chat-prompt-area mt-3">
-                    <div id="activeDocButtons" class="active-doc-buttons"></div>
+                <div id="activeDocButtons" class="active-doc-buttons"></div>
                 <textarea id="prompt" class="form-control mb-2 rounded-3" rows="3" style="resize:vertical; min-height: 38px; max-height: 180px;" placeholder="Type your request here"></textarea>
                 <div class="text-muted instruction-text">Enter to submit, Shift+Enter for a new line</div>
                 <input type="file" id="quickFileInput" style="display: none" multiple accept=".txt,.pdf,.doc,.docx,.csv,.xlsx" max="4">
             </div>
         </div>
 
-        <!-- Right column - controls (improved project switcher) -->
+        <!-- Right column - controls -->
         <div class="input-column">
-            <div class="project-switcher-section mb-3 text-white" style="background: #0c5460;">
-                <div class="project-label" style="font-size: 0.92em; font-weight: 500; opacity: 0.85;">Current Project:</div>
-                <div style="position: relative; margin-top: 0.5em;">
-                    <select id="projectSelect" class="project-title-select" style="font-size: 1.1em; font-weight: bold; background: #0c5460; color: #fff; border: 1.5px solid #fff; border-radius: 10px; padding: 8px 36px 8px 12px; margin-bottom: 0.5em; appearance: none; width: 100%;">
-                        <option value="" disabled>Change Project</option>
-                        <!-- Project options will be populated here by JS -->
-                    </select>
-                    <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 1.1em; color: #fff; opacity: 0.7;">
-                        ▼
-                    </span>
-                </div>
-                <div class="d-flex mt-2">
-                    <button class="btn btn-primary me-2" onclick="createNewProject()">
-                        <i class="bi bi-plus-circle"></i>&nbsp;New Project
-                    </button>
-                    <button class="btn btn-outline-light" onclick="editCurrentProject()" id="editProjectBtn" disabled>
-                        <i class="bi bi-pencil"></i> Edit Project
-                    </button>
-                </div>
-            </div>
-
-            <!-- Documents section -->
-            <div class="documents-section mb-3">
-                <!-- Available Documents section -->
-                <div class="document-selection mt-3">
-                    <h5 class="mb-0">Available Documents in this Project</h5>
-                    <div id="uploadedFileList" class="document-list"></div>
-                    <small class="text-muted mb-2 d-block">
-                        Toggle documents to include in your chat
-                    </small>
-                    <div class="d-flex align-items-center mt-2" style="gap: 0.75em;">
-                        <button id="addFilesBtn" class="btn btn-primary d-flex align-items-center" title="Upload Document">
-                            <i class="bi bi-plus-circle"></i>
-                            <span class="ms-2">Add Files</span>
-                        </button>
-                        <div class="form-check ms-2" style="display: flex; align-items: center;">
-                            <input class="form-check-input" type="checkbox" id="toggleAllDocs" style="margin-right: 0.3em;">
-                            <label class="form-check-label" for="toggleAllDocs" style="font-size: 0.95em;">Toggle All</label>
+            <button id="clearButton" class="btn btn-primary mb-3 d-flex align-items-center justify-content-center">
+                <i class="bi bi-plus-circle"></i>
+                <span class="ms-2">Start New Chat</span>
+            </button>
+            <!-- Tabs navigation -->
+            <ul class="nav nav-tabs mb-3" id="sidebarTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="doc-library-tab" data-bs-toggle="tab" data-bs-target="#doc-library" type="button" role="tab" aria-controls="doc-library" aria-selected="true">Document Library</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="chat-history-tab" data-bs-toggle="tab" data-bs-target="#chat-history" type="button" role="tab" aria-controls="chat-history" aria-selected="false">Chat History</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="sidebarTabsContent">
+                <!-- Document Library Tab -->
+                <div class="tab-pane fade show active" id="doc-library" role="tabpanel" aria-labelledby="doc-library-tab">
+                    <div class="documents-section mb-3">
+                        <div class="document-selection mt-3">
+                            <h5 class="mb-0">Available Documents</h5>
+                            <div id="uploadedFileList" class="document-list"></div>
+                            <small class="text-muted mb-2 d-block">
+                                Select documents to include in your chat
+                            </small>
+                            <div class="d-flex align-items-center mt-2" style="gap: 0.75em;">
+                                <button id="addFilesBtn" class="btn btn-primary d-flex align-items-center" title="Upload Document">
+                                    <i class="bi bi-plus-circle"></i>
+                                    <span class="ms-2">Add Files</span>
+                                </button>
+                                <div class="form-check ms-2" style="display: flex; align-items: center;">
+                                    <input class="form-check-input" type="checkbox" id="toggleAllDocs" style="margin-right: 0.3em;">
+                                    <label class="form-check-label" for="toggleAllDocs" style="font-size: 0.95em;">Select/Clear All</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 add-documents-area">
+                            <h6>Add Documents</h6>
+                            <div class="file-upload-info mb-2">
+                                <small class="text-muted">
+                                    Supported formats: .txt, .pdf, .doc, .docx, .csv, .xlsx (Max 4 files)
+                                </small>
+                            </div>
+                            <input type="file"
+                                   id="fileInput"
+                                   name="file"
+                                   multiple
+                                   accept=".txt,.pdf,.doc,.docx,.csv,.xlsx"
+                                   max="4"
+                                   class="form-control mb-2">
                         </div>
                     </div>
                 </div>
-
-                <!-- Add Documents section (hidden) -->
-                <div class="mt-3 add-documents-area">
-                    <h6>Add Documents</h6>
-                    <div class="file-upload-info mb-2">
-                        <small class="text-muted">
-                            Supported formats: .txt, .pdf, .doc, .docx, .csv, .xlsx (Max 4 files)
-                        </small>
+                <!-- Chat History Tab -->
+                <div class="tab-pane fade" id="chat-history" role="tabpanel" aria-labelledby="chat-history-tab">
+                    <div class="chats-section">
+                        <h5>Chat History for this Workspace</h5>
+                        <div id="previousChats" class="border rounded p-3 bg-light">
+                            <!-- Chat history will be populated here -->
+                        </div>
                     </div>
-                    <input type="file"
-                           id="fileInput"
-                           name="file"
-                           multiple
-                           accept=".txt,.pdf,.doc,.docx,.csv,.xlsx"
-                           max="4"
-                           class="form-control mb-2">
-                </div>
-            </div>
-
-            <!-- Chat History section (button now below title, above list) -->
-            <div class="chats-section">
-                <h5>Chat History for this Project</h5>
-                <button id="clearButton" class="btn btn-primary mb-3 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-plus-circle"></i>
-                    <span class="ms-2">Start New Chat</span>
-                </button>
-                <div id="previousChats" class="border rounded p-3 bg-light">
-                    <!-- Chat history will be populated here -->
                 </div>
             </div>
         </div>
@@ -126,12 +133,12 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create New Project</h5>
+                <h5 class="modal-title">Create New Workspace</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="projectName" class="form-label">Project Name</label>
+                    <label for="projectName" class="form-label">Workspace Name</label>
                     <input type="text" class="form-control" id="projectName">
                 </div>
                 <div class="mb-3">
@@ -141,15 +148,15 @@
                 <div class="mb-3">
                     <label for="customPrompt" class="form-label">System Instructions</label>
                     <textarea class="form-control" id="systemInstructions" rows="4"
-                              placeholder="Enter any special instructions for Claude when working on this project..."></textarea>
+                              placeholder="Enter any special instructions for Claude when working on this workspace..."></textarea>
                     <small class="form-text text-muted">
-                        These instructions will be included with every prompt sent to Claude for this project.
+                        These instructions will be included with every prompt sent to Claude for this workspace.
                     </small>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveProject()">Save Project</button>
+                <button type="button" class="btn btn-primary" onclick="saveProject()">Save Workspace</button>
             </div>
         </div>
     </div>

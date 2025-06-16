@@ -32,6 +32,7 @@ def create_app():
     from app.routes.document_library import document_bp
     from app.routes.routes import public_bp
     from app.routes.user_routes import user_bp
+    from app.routes.research_routes import research_bp
 
     app.register_blueprint(chat_bp)
     app.register_blueprint(admin_blueprint, url_prefix='/admin')
@@ -39,9 +40,10 @@ def create_app():
     app.register_blueprint(document_bp)
     app.register_blueprint(public_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(research_bp)
 
     # Create tables
-    # with app.app_context():
-    #     db.create_all()
+    with app.app_context():
+        db.create_all()
 
     return app

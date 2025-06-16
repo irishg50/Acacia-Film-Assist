@@ -7,7 +7,7 @@ from flask_login import UserMixin
 from sqlalchemy import Index
 
 class APILog(db.Model):
-    __tablename__ = 'montechat_api_log'
+    __tablename__ = 'nomadchat_api_log'
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     prompt = db.Column(db.Text)
@@ -17,14 +17,14 @@ class APILog(db.Model):
     cache_tokens = db.Column(db.Integer)
     model = db.Column(db.String(50))
     thread_id = db.Column(db.String(100))
-    user_id = db.Column(db.Integer, db.ForeignKey('montechat_users.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), nullable=True)
     user = db.relationship('User', back_populates='api_logs')
 
     def __repr__(self):
         return f'<APILog {self.id}>'
 
 class Organization(db.Model):
-    __tablename__ = 'montechat_organization'
+    __tablename__ = 'nomadchat_organization'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False, unique=True, index=True)
     domain = db.Column(db.String(100), nullable=True, unique=True, index=True)  # e.g. example.org
@@ -40,7 +40,7 @@ class Organization(db.Model):
         return f'<Organization {self.name}>'
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'montechat_users'
+    __tablename__ = 'nomadchat_users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     password_hash = db.Column(db.String(255))
@@ -55,7 +55,7 @@ class User(UserMixin, db.Model):
     agreement_text = db.Column(db.Text, nullable=True)
     login_records = db.relationship('LoginRecord', back_populates='user')
     api_logs = db.relationship('APILog', back_populates='user')
-    organization_id = db.Column(db.Integer, db.ForeignKey('montechat_organization.id'), nullable=True, index=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey('nomadchat_organization.id'), nullable=True, index=True)
     organization = db.relationship('Organization', back_populates='users')
 
     def set_password(self, password):
@@ -73,19 +73,19 @@ class User(UserMixin, db.Model):
 
 
 class LoginRecord(db.Model):
-    __tablename__ = 'montechat_login_record'
+    __tablename__ = 'nomadchat_login_record'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('montechat_users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), nullable=False)
     login_time = db.Column(db.DateTime, nullable=False)
 
     user = db.relationship('User', back_populates='login_records')
 
 
 class ChatSession(db.Model):
-    __tablename__ = 'montechat_chatsession'
+    __tablename__ = 'nomadchat_chatsession'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('montechat_users.id'), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('montechat_project.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('nomadchat_project.id'), nullable=False)
     session_id = db.Column(db.String(36), nullable=False)
     model = db.Column(db.String(50), nullable=False)
     chat_history = db.Column(db.Text, nullable=False)
@@ -100,9 +100,9 @@ class ChatSession(db.Model):
         return json.loads(self.chat_history)
 
 class Project(db.Model):
-    __tablename__ = 'montechat_project'
+    __tablename__ = 'nomadchat_project'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('montechat_users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     system_instructions = db.Column(db.Text, nullable=True)
@@ -113,11 +113,11 @@ class Project(db.Model):
     chat_sessions = db.relationship('ChatSession', backref='project', lazy=True)
 
 class Document(db.Model):
-    __tablename__ = 'montechat_documents'
+    __tablename__ = 'nomadchat_documents'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('montechat_users.id'), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('montechat_project.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('nomadchat_project.id'), nullable=False)
     filename = db.Column(db.String(255), nullable=False)
     file_type = db.Column(db.String(50), nullable=False)  # e.g., 'pdf', 'txt', 'csv'
     file_size = db.Column(db.Integer, nullable=False)  # size in bytes
@@ -155,10 +155,10 @@ class Document(db.Model):
 
 
 class DocumentChunk(db.Model):
-    __tablename__ = 'montechat_document_chunks'
+    __tablename__ = 'nomadchat_document_chunks'
 
     id = db.Column(db.Integer, primary_key=True)
-    document_id = db.Column(db.Integer, db.ForeignKey('montechat_documents.id', ondelete='CASCADE'), nullable=False)
+    document_id = db.Column(db.Integer, db.ForeignKey('nomadchat_documents.id', ondelete='CASCADE'), nullable=False)
     chunk_number = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text, nullable=False)
     token_count = db.Column(db.Integer, nullable=False)
@@ -181,9 +181,9 @@ class DocumentChunk(db.Model):
         }
 
 class UserChatMemory(db.Model):
-    __tablename__ = 'montechat_user_chat_memory'
+    __tablename__ = 'nomadchat_user_chat_memory'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('montechat_users.id'), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), nullable=False, unique=True)
     memory_text = db.Column(db.Text, nullable=False)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -193,7 +193,7 @@ class UserChatMemory(db.Model):
         return f'<UserChatMemory user_id={self.user_id}>'
 
 class UserAgreement(db.Model):
-    __tablename__ = 'montechat_user_agreement'
+    __tablename__ = 'nomadchat_user_agreement'
     id = db.Column(db.Integer, primary_key=True)
     version = db.Column(db.String(50), nullable=False)
     title = db.Column(db.String(200), nullable=False)
@@ -205,10 +205,10 @@ class UserAgreement(db.Model):
         return f'<UserAgreement {self.version}>'
 
 class UserSurvey(db.Model):
-    __tablename__ = 'montechat_user_survey'
+    __tablename__ = 'nomadchat_user_survey'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('montechat_users.id'), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), unique=True)
     job_title = db.Column(db.String(100))
     primary_responsibilities = db.Column(db.Text)
     top_priorities = db.Column(db.Text)
@@ -219,6 +219,24 @@ class UserSurvey(db.Model):
     
     # Relationship
     user = db.relationship('User', backref=db.backref('survey', uselist=False))
+
+class ResearchSession(db.Model):
+    __tablename__ = 'nomadchat_research_session'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('nomadchat_users.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('nomadchat_project.id'), nullable=False)
+    topic = db.Column(db.String(255), nullable=False)
+    focus_areas = db.Column(db.Text, nullable=True)  # Stored as string representation of list
+    research_content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship('User', backref=db.backref('research_sessions', lazy=True))
+    project = db.relationship('Project', backref=db.backref('research_sessions', lazy=True))
+
+    def __repr__(self):
+        return f'<ResearchSession {self.topic}>'
 
 # Add indexes for organization
 Index('ix_organization_name', Organization.name)

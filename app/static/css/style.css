@@ -1,6 +1,6 @@
 /* style.css - Global and shared styles */
 body {
-    background-color: #e1e1e1;
+    background-color: #fff7ed;
     min-height: 100vh;
 }
 
@@ -42,9 +42,9 @@ h5 {
 }
 
 .alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
+    color: #6b3f1d;
+    background-color: #fbbf24;
+    border-color: #f59e42;
     padding: .75rem 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid transparent;
@@ -111,9 +111,8 @@ h5 {
 }
 
 /* Navbar Brand Title Styling */
-/* Navbar Brand Title Styling */
 .navbar-brand-title {
-    color: #0c5460;
+    color: #d97706;
     font-weight: bold;
     font-size: 1.4rem; /* Adjust size as needed to match the look of the navbar */
     margin: 0; /* Remove default margin to align it properly in the navbar */
@@ -124,7 +123,7 @@ h5 {
 
 /* Headers Styling for Content Block */
 h5 {
-    color: #0c5460;
+    color: #d97706;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
     font-size: 1.0rem; /* Slightly larger font size to make the headers more prominent */
@@ -133,7 +132,7 @@ h5 {
 /* Form Control Styling (Input, Select, Textarea) */
 .form-control,
 .form-select {
-    border: 2px solid #2e425d; /* Dark blue outline by default */
+    border: 2px solid #b45309;
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
     transition: border-color 0.3s ease; /* Smooth transition for focus state */
@@ -141,35 +140,35 @@ h5 {
 
 .form-control:focus,
 .form-select:focus {
-    border-color: #0c5460; /* Reddish-brown outline for focused fields */
-    box-shadow: 0 0 5px rgba(179, 85, 85, 0.5); /* Optional: add a subtle glow to emphasize the focus state */
+    border-color: #d97706;
+    box-shadow: 0 0 5px rgba(219, 119, 6, 0.5);
 }
 
 /* Buttons Styling */
 .btn-primary {
-    background-color: #1abc9c;
-    border-color: #1abc9c;
+    background-color: #d97706;
+    border-color: #d97706;
 }
 
 .btn-primary:hover {
-    background-color: #16a085;
-    border-color: #16a085;
+    background-color: #b45309;
+    border-color: #b45309;
 }
 
 .btn-secondary {
-    background-color: #f8f9fa; /* Light grey background for secondary button */
-    color: #2e425d; /* Dark blue text for contrast */
-    border: 1px solid #2e425d; /* Dark blue border */
+    background-color: #fff7ed;
+    color: #b45309;
+    border: 1px solid #b45309;
 }
 
 .btn-secondary:hover {
-    background-color: #0c5460; /* Reddish-brown background on hover */
-    color: #ffffff; /* White text for better contrast */
+    background-color: #6b3f1d;
+    color: #ffffff;
 }
 
 /* Styling for Labels and Custom Tone Input */
 label {
-    color: #2e425d; /* Dark blue for labels to match the form control outline */
+    color: #b45309;
 }
 
 #custom_tone_container {
@@ -186,7 +185,7 @@ label {
 
 /* Styling for Focused Input File Containers */
 input[type="file"]:focus {
-    border: 2px solid #0c5460; /* Reddish-brown outline when focused */
+    border: 2px solid #d97706;
 }
 
 
@@ -207,24 +206,24 @@ input[type="file"]:focus {
     justify-content: space-between;
     gap: 10px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #2e425d; /* Dark blue border at the bottom to separate content visually */
+    border-bottom: 2px solid #b45309;
 }
 
 /* Styling for Model Name and Word Count */
 .model {
     font-weight: bold;
-    color: #0c5460; /* Reddish-brown to align with the headers */
+    color: #d97706;
 }
 
 .word-count {
-    color: #2e425d; /* Dark blue to create a clear contrast */
+    color: #b45309;
 }
 
 /* Button Styling - General */
 button {
-    border: 2px solid #2e425d; /* Dark blue border for consistency */
-    background-color: #f8f9fa; /* Light grey background */
-    color: #2e425d; /* Dark blue text */
+    border: 2px solid #b45309;
+    background-color: #fff7ed;
+    color: #b45309;
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
@@ -233,9 +232,9 @@ button {
 
 /* Button Hover State */
 button:hover {
-    background-color: #0c5460; /* Reddish-brown background on hover */
-    color: #ffffff; /* White text on hover for contrast */
-    border-color: #0c5460; /* Reddish-brown border on hover */
+    background-color: #6b3f1d;
+    color: #ffffff;
+    border-color: #6b3f1d;
 }
 
 /* Specific Button Styles */
@@ -245,16 +244,16 @@ button:hover {
 
 /* Toggle and Copy Buttons - Differentiate Visually */
 .toggle-button, .copy-button {
-    background-color: #2e425d; /* Dark blue background by default */
-    color: #ffffff; /* White text for contrast */
-    border: 2px solid #2e425d; /* Dark blue border for consistency */
+    background-color: #b45309;
+    color: #ffffff;
+    border: 2px solid #b45309;
 }
 
 /* Toggle Button Hover State */
 .toggle-button:hover, .copy-button:hover {
-    background-color: #0c5460; /* Reddish-brown background on hover */
-    color: #ffffff; /* Keep text white for better contrast */
-    border-color: #0c5460;
+    background-color: #6b3f1d;
+    color: #ffffff;
+    border-color: #6b3f1d;
 }
 
 /* Readability and Content Check Reports */
@@ -262,27 +261,27 @@ button:hover {
 .content-check-report {
     padding: 10px;
     margin-top: 8px;
-    background-color: #f9f9f9; /* Light grey for the report section background */
+    background-color: #fff7ed;
     border-radius: 6px;
-    border: 1px solid #0c5460; /* Reddish-brown border for distinction */
-    color: #2e425d; /* Dark blue text for readability */
+    border: 1px solid #d97706;
+    color: #b45309;
 }
 
 /* Response Content Styling */
 .response-content {
     margin-top: 10px;
     padding: 10px;
-    background-color: #f0f0f0; /* Very light grey to separate the response visually */
+    background-color: #fff7ed;
     border-radius: 8px;
-    border: 1px solid #dee2e6;
-    color: #2e425d; /* Dark blue for response text */
+    border: 1px solid #fbbf24;
+    color: #b45309;
 }
 
 /* Styling for Remove Button in File List */
 .remove-button {
-    background-color: #f8f9fa; /* Light grey background for the button */
-    color: #0c5460; /* Reddish-brown text color */
-    border: 2px solid #0c5460; /* Reddish-brown border to match the color scheme */
+    background-color: #fff7ed;
+    color: #d97706;
+    border: 2px solid #d97706;
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
@@ -291,9 +290,9 @@ button:hover {
 
 /* Hover State for Remove Button */
 .remove-button:hover {
-    background-color: #0c5460; /* Reddish-brown background on hover */
-    color: #ffffff; /* White text for better contrast */
-    border-color: #0c5460; /* Keep the border reddish-brown on hover */
+    background-color: #6b3f1d;
+    color: #ffffff;
+    border-color: #6b3f1d;
 }
 
 .processing-message {
