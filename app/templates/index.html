@@ -48,18 +48,17 @@
                 <i class="bi bi-plus-circle"></i>
                 <span class="ms-2">Start New Chat</span>
             </button>
-            <!-- Tabs navigation -->
-            <ul class="nav nav-tabs mb-3" id="sidebarTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="doc-library-tab" data-bs-toggle="tab" data-bs-target="#doc-library" type="button" role="tab" aria-controls="doc-library" aria-selected="true">Document Library</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="chat-history-tab" data-bs-toggle="tab" data-bs-target="#chat-history" type="button" role="tab" aria-controls="chat-history" aria-selected="false">Chat History</button>
-                </li>
-            </ul>
-            <div class="tab-content" id="sidebarTabsContent">
-                <!-- Document Library Tab -->
-                <div class="tab-pane fade show active" id="doc-library" role="tabpanel" aria-labelledby="doc-library-tab">
+            <!-- Sidebar section selector -->
+            <div class="mb-3">
+                <select id="sidebarSectionSelect" class="form-select" style="font-weight: 500; background: #f3f4f6; color: #6b3f1d; border: 1.5px solid #b45309; border-radius: 8px;">
+                    <option value="doc-library" selected>Document Library</option>
+                    <option value="chat-history">Chat History</option>
+                    <option value="research-history">Research History</option>
+                </select>
+            </div>
+            <div id="sidebarSectionPanes">
+                <div class="sidebar-section-pane" id="doc-library-pane">
+                    <!-- Document Library content here -->
                     <div class="documents-section mb-3">
                         <div class="document-selection mt-3">
                             <h5 class="mb-0">Available Documents</h5>
@@ -95,14 +94,17 @@
                         </div>
                     </div>
                 </div>
-                <!-- Chat History Tab -->
-                <div class="tab-pane fade" id="chat-history" role="tabpanel" aria-labelledby="chat-history-tab">
+                <div class="sidebar-section-pane d-none" id="chat-history-pane">
+                    <!-- Chat History content here -->
                     <div class="chats-section">
                         <h5>Chat History for this Workspace</h5>
                         <div id="previousChats" class="border rounded p-3 bg-light">
                             <!-- Chat history will be populated here -->
                         </div>
                     </div>
+                </div>
+                <div class="sidebar-section-pane d-none" id="research-history-pane">
+                    <!-- Research history will be loaded here by JS -->
                 </div>
             </div>
         </div>

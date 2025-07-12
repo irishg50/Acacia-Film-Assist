@@ -368,6 +368,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // Initial sync
     updateToggleAllCheckbox();
+
+    // Sidebar section dropdown logic
+    const sectionSelect = document.getElementById('sidebarSectionSelect');
+    const sectionPanes = {
+        'doc-library': document.getElementById('doc-library-pane'),
+        'chat-history': document.getElementById('chat-history-pane'),
+        'research-history': document.getElementById('research-history-pane')
+    };
+    function showSidebarPane(selected) {
+        Object.keys(sectionPanes).forEach(key => {
+            if (key === selected) {
+                sectionPanes[key].classList.remove('d-none');
+            } else {
+                sectionPanes[key].classList.add('d-none');
+            }
+        });
+    }
+    if (sectionSelect) {
+        sectionSelect.addEventListener('change', function() {
+            showSidebarPane(this.value);
+            if (this.value === 'research-history') {
+                loadResearchHistorySidebar();
+            }
+        });
+        // Show default pane on load
+        showSidebarPane(sectionSelect.value);
+        if (sectionSelect.value === 'research-history') {
+            loadResearchHistorySidebar();
+        }
+    }
 });
 
 // Message Management
@@ -569,22 +599,21 @@ async function handleResearchRequest(topic, focusAreas = []) {
         }
 
         const data = await response.json();
-        
-        // Add research results to chat
-        addMessageToChatHistory('AI', `Here's what I found about ${topic}:\n\n${data.research.content}`);
-        
-        // Add a button to view full research history
-        const historyButton = document.createElement('button');
-        historyButton.className = 'btn btn-sm btn-outline-secondary mt-2';
-        historyButton.textContent = 'View Research History';
-        historyButton.onclick = () => loadResearchHistory();
-        
-        const messageElement = document.querySelector('.ai-message:last-child');
-        if (messageElement) {
-            messageElement.appendChild(historyButton);
-        }
-
-    } catch (error) {
+        // Show only a task completed message with a download link
+        const sessionId = data.session_id;
+        const downloadUrl = `/api/research/${sessionId}/download`;
+        const message = `Research task completed. <a href="${downloadUrl}" target="_blank" class="btn btn-sm btn-outline-primary ms-2">Download Report (.docx)</a>`;
+        addMessageToChatHistory('AI', message);
+        // Optionally, add a button to view research history
+        // const historyButton = document.createElement('button');
+        // historyButton.className = 'btn btn-sm btn-outline-secondary mt-2';
+        // historyButton.textContent = 'View Research History';
+        // historyButton.onclick = () => loadResearchHistory();
+        // const messageElement = document.querySelector('.ai-message:last-child');
+        // if (messageElement) {
+        //     messageElement.appendChild(historyButton);
+        // }
+x``    } catch (error) {
         console.error('Research error:', error);
         addMessageToChatHistory('System', `Error during research: ${error.message}`);
     }
@@ -876,7 +905,7 @@ function createNewProject() {
     projectModal = projectModal || new bootstrap.Modal(document.getElementById('projectModal'));
     document.getElementById('projectName').value = '';
     document.getElementById('projectDescription').value = '';
-    document.querySelector('#projectModal .modal-title').textContent = 'Create New Project';
+    document.querySelector('#projectModal .modal-title').textContent = 'Create New Workspace';
     projectModal.show();
 }
 
@@ -1108,27 +1137,62 @@ function clearChatHistoryMessages() {
     if (chatMessages) chatMessages.innerHTML = '';
 }
 
+// Enhance chat history loading to insert research results for research requests
+async function enhanceChatHistoryWithResearch(chatHistory, projectId) {
+    // Fetch research history for this project
+    let researchMap = {};
+    try {
+        const response = await fetch(`${baseUrl}/api/research/history?project_id=${projectId}`);
+        if (response.ok) {
+            const data = await response.json();
+            for (const item of data.research_history) {
+                // Use topic as key for quick lookup
+                researchMap[item.topic.trim().toLowerCase()] = item.research_content;
+            }
+        }
+    } catch (e) {
+        // Ignore errors, just don't enhance
+    }
+    // Build new chat history with research results inserted
+    let enhanced = [];
+    for (let i = 0; i < chatHistory.length; ++i) {
+        const msg = chatHistory[i];
+        enhanced.push(msg);
+        if (msg.role === 'user' && msg.content.includes('[RESEARCH_REQUEST]')) {
+            // Try to extract topic
+            const match = msg.content.match(/topic:\s*(.*?)(?:\n|$)/);
+            if (match) {
+                const topic = match[1].replace(/['"\n]/g, '').trim().toLowerCase();
+                if (researchMap[topic]) {
+                    enhanced.push({
+                        role: 'assistant',
+                        content: researchMap[topic]
+                    });
+                }
+            }
+        }
+    }
+    return enhanced;
+}
+
+// Patch chat loading to use enhanced history
 async function loadChat(sessionId) {
     try {
         const response = await fetch(`${baseUrl}/api/chats/${sessionId}`);
         if (!response.ok) throw new Error('Failed to load chat');
-
         const data = await response.json();
-        const chatHistory = document.getElementById('chatHistory');
-        const chatMessages = chatHistory.querySelector('.chat-history-messages');
-
-        if (chatHistory && data.chat_history && chatMessages) {
-            clearChatHistoryMessages();
-            // Reset the flag before loading previous chat
-            isFirstAIMessage = true;
-            currentAIMessage = '';
-            data.chat_history.forEach(msg => {
-                addMessageToChatHistory(msg.role === 'user' ? 'User' : 'AI', msg.content, true);
-            });
-            setTimeout(scrollToBottom, 100);
+        let chatHistory = data.chat_history || [];
+        // Enhance with research results if needed
+        chatHistory = await enhanceChatHistoryWithResearch(chatHistory, currentProject);
+        // Now render as before
+        const chatHistoryDiv = document.querySelector('#chatHistory .chat-history-messages');
+        chatHistoryDiv.innerHTML = '';
+        for (const msg of chatHistory) {
+            addMessageToChatHistory(msg.role === 'user' ? 'User' : 'AI', msg.content);
         }
+        scrollToBottom();
     } catch (error) {
-        console.error('Error loading chat:', error);
+        addMessageToChatHistory('System', 'Error loading chat: ' + error.message);
     }
 }
 
@@ -1324,7 +1388,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function editCurrentProject() {
     if (!currentProject) {
-        addMessageToChatHistory('System', 'Please select a project first.');
+        addMessageToChatHistory('System', 'Please select a workspace first.');
         return;
     }
 
@@ -1341,17 +1405,17 @@ async function editCurrentProject() {
         document.getElementById('systemInstructions').value = project.system_instructions || '';
 
         // Update modal title
-        document.querySelector('#projectModal .modal-title').textContent = 'Edit Project';
+        document.querySelector('#projectModal .modal-title').textContent = 'Edit Workspace';
         projectModal.show();
     } catch (error) {
         console.error('Error loading project:', error);
-        addMessageToChatHistory('System', 'Error loading project details');
+        addMessageToChatHistory('System', 'Error loading workspace details');
     }
 }
 
 async function clearChatAndUploads() {
     if (!currentProject) {
-        addMessageToChatHistory('System', 'Please select a project first.');
+        addMessageToChatHistory('System', 'Please select a workspace first.');
         return;
     }
 
@@ -1467,4 +1531,68 @@ document.getElementById('projectSelect').addEventListener('change', function() {
 function submitSuggestedQuestion(question) {
     document.getElementById('prompt').value = question;
     sendMessage();
+}
+
+function renderResearchHistoryList(researchHistory) {
+    const container = document.getElementById('research-history-pane');
+    if (!container) return;
+    if (!researchHistory.length) {
+        container.innerHTML = '<div class="text-muted p-3">No research history for this workspace yet.</div>';
+        return;
+    }
+    container.innerHTML = researchHistory.map(item => `
+        <div class="research-item p-3 mb-3 border rounded" style="background: #fff;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">${item.topic}</h6>
+                <span class="text-muted small">${new Date(item.created_at).toLocaleString()}</span>
+            </div>
+            <div class="text-muted small mb-2">
+                ${item.focus_areas && item.focus_areas.length ? `Focus: ${item.focus_areas.join(', ')}` : ''}
+            </div>
+            <div class="research-preview" style="cursor:pointer; color:#b45309;" data-session-id="${item.id}">
+                ${item.preview}
+                <span class="ms-2" style="font-size:0.9em;">[Expand]</span>
+            </div>
+            <div class="research-full d-none mt-2" id="research-full-${item.id}">
+                <div style="white-space: pre-line;">${item.research_content}</div>
+                <span class="text-primary small" style="cursor:pointer;" data-session-id="${item.id}">[Collapse]</span>
+            </div>
+        </div>
+    `).join('');
+    // Add expand/collapse listeners
+    container.querySelectorAll('.research-preview').forEach(el => {
+        el.onclick = function() {
+            const id = this.getAttribute('data-session-id');
+            document.getElementById('research-full-' + id).classList.remove('d-none');
+            this.classList.add('d-none');
+        };
+    });
+    container.querySelectorAll('.research-full .text-primary').forEach(el => {
+        el.onclick = function() {
+            const id = this.getAttribute('data-session-id');
+            document.getElementById('research-full-' + id).classList.add('d-none');
+            container.querySelector('.research-preview[data-session-id="' + id + '"]').classList.remove('d-none');
+        };
+    });
+}
+
+async function loadResearchHistorySidebar() {
+    if (!currentProject) {
+        document.getElementById('research-history-pane').innerHTML = '<div class="text-muted p-3">Please select a workspace to view research history.</div>';
+        return;
+    }
+    try {
+        const response = await fetch(`${baseUrl}/api/research/history?project_id=${currentProject}`);
+        if (!response.ok) throw new Error('Failed to load research history');
+        const data = await response.json();
+        // Parse focus_areas if needed
+        const researchHistory = (data.research_history || []).map(item => ({
+            ...item,
+            focus_areas: typeof item.focus_areas === 'string' ? JSON.parse(item.focus_areas || '[]') : (item.focus_areas || []),
+            preview: item.research_content.slice(0, 180) + (item.research_content.length > 180 ? '...' : ''),
+        }));
+        renderResearchHistoryList(researchHistory);
+    } catch (error) {
+        document.getElementById('research-history-pane').innerHTML = '<div class="text-danger p-3">Error loading research history.</div>';
+    }
 }

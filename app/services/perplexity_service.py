@@ -27,49 +27,62 @@ class PerplexityService:
             Dict containing research results and metadata
         """
         try:
-            # Construct a detailed prompt for documentary research
-            prompt = f"""Research the following documentary topic: {topic}
-            
-            Please provide:
-            1. Key historical context and background
-            2. Main figures or subjects involved
-            3. Current relevance or impact
-            4. Potential visual elements or archival materials
-            5. Notable controversies or challenges
-            6. Related documentary films or media
-            """
-            
+            # Research a topic using Perplexity API, with a general, comprehensive prompt
+            user_prompt = f"Provide a comprehensive, detailed overview of {topic}. Include all relevant facts, context, and sources."
             if focus_areas:
-                prompt += f"\n\nPlease pay special attention to: {', '.join(focus_areas)}"
-
-            # Make API request to Perplexity
+                user_prompt += f"\nFocus especially on: {', '.join(focus_areas)}."
+            system_prompt = "Be precise and concise."
+            payload = {
+                "model": "sonar",
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "reasoning_effort": "high"
+            }
             response = requests.post(
                 f"{self.base_url}/chat/completions",
                 headers=self.headers,
-                json={
-                    "model": "pplx-7b-online",  # Using the online model for real-time research
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 1000
-                }
+                json=payload
             )
             
             if response.status_code != 200:
                 raise Exception(f"Perplexity API error: {response.text}")
 
-            result = response.json()
+            data = response.json()
             
-            # Process and structure the response
-            research_data = {
-                "topic": topic,
-                "content": result["choices"][0]["message"]["content"],
-                "focus_areas": focus_areas,
-                "metadata": {
-                    "model": result["model"],
-                    "created_at": result["created"]
-                }
-            }
+            # Build sources section in Markdown
+            sources_md = "\n\n## Sources\n"
+            # Add citations (if any)
+            citations = data.get('citations') or []
+            for c in citations:
+                if isinstance(c, str) and c.startswith('http'):
+                    sources_md += f"- {c}\n"
+                else:
+                    sources_md += f"- {c}\n"
+            # Add search results (if any)
+            search_results = data.get('search_results') or []
+            for r in search_results:
+                url = r.get('url')
+                title = r.get('title', url or 'Source')
+                if url:
+                    sources_md += f"- [{title}]({url})\n"
+            # Robustly extract main content
+            content = data.get('content')
+            if not content:
+                # Try OpenAI/Perplexity chat format
+                choices = data.get('choices')
+                if choices and isinstance(choices, list) and len(choices) > 0:
+                    message = choices[0].get('message')
+                    if message and 'content' in message:
+                        content = message['content']
+            if not content:
+                content = data.get('research_content', '')
+            if sources_md.strip() != '## Sources':
+                content = (content or '').rstrip() + sources_md
+            data['content'] = content
             
-            return research_data
+            return data
 
         except Exception as e:
             current_app.logger.error(f"Error in Perplexity research: {str(e)}")

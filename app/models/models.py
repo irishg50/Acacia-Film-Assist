@@ -230,6 +230,7 @@ class ResearchSession(db.Model):
     research_content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    perplexity_response = db.Column(db.Text, nullable=True)
 
     # Relationships
     user = db.relationship('User', backref=db.backref('research_sessions', lazy=True))
