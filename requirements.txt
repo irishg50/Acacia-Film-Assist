@@ -30,3 +30,4 @@ tenacity>=8.0.0
 # for document chunking
 tiktoken
 
+gunicorn
