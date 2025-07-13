@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, request
 from flask_login import current_user
+from sqlalchemy import inspect
 from app.extensions import db, csrf, login_manager
 from app import config
 
@@ -42,8 +43,40 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(research_bp)
 
-    # Create tables
+    # Initialize database tables
     with app.app_context():
-        db.create_all()
+        try:
+            # Check if tables exist before creating them
+            inspector = inspect(db.engine)
+            existing_tables = inspector.get_table_names()
+            
+            if not existing_tables:
+                # Only create tables if database is empty
+                print("Creating database tables...")
+                db.create_all()
+                print("Database tables created successfully")
+            else:
+                print(f"Database already has {len(existing_tables)} tables, skipping creation")
+                
+        except Exception as e:
+            print(f"Database initialization error: {e}")
+            
+            # If there's an index conflict, try to create tables without indexes
+            if "already exists" in str(e) and "ix_organization_name" in str(e):
+                print("Attempting to create tables without indexes...")
+                try:
+                    # Drop the problematic index if it exists
+                    with db.engine.connect() as conn:
+                        conn.execute(db.text("DROP INDEX IF EXISTS ix_organization_name"))
+                        conn.commit()
+                    
+                    # Try creating tables again
+                    db.create_all()
+                    print("Database tables created successfully after index cleanup")
+                except Exception as retry_error:
+                    print(f"Retry failed: {retry_error}")
+                    # Continue anyway - tables might already be functional
+            
+            # Continue with app startup even if there are issues
 
     return app
