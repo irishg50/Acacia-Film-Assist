@@ -7,16 +7,22 @@ import json
 def should_update_project_memory(project_id):
     """
     Check if project memory should be updated based on smart logic:
-    - 3+ new chat sessions since last update, OR
-    - 24+ hours have passed since last update, OR
+    - Configurable number of new chat sessions since last update, OR
+    - Configurable hours have passed since last update, OR
     - Force update is requested
     """
+    from flask import current_app
+    
     memory = ProjectMemory.query.filter_by(project_id=project_id).first()
     if not memory:
         return True  # No memory exists, create it
     
-    # Check if 24+ hours have passed
-    if datetime.utcnow() - memory.last_updated > timedelta(hours=24):
+    # Get configurable thresholds
+    update_hours = current_app.config.get('PROJECT_MEMORY_UPDATE_HOURS', 24)
+    update_sessions = current_app.config.get('PROJECT_MEMORY_UPDATE_SESSIONS', 3)
+    
+    # Check if enough hours have passed
+    if datetime.utcnow() - memory.last_updated > timedelta(hours=update_hours):
         return True
     
     # Count new chat sessions since last update
@@ -25,8 +31,8 @@ def should_update_project_memory(project_id):
         ChatSession.created_at > memory.last_updated
     ).count()
     
-    # Update if 3+ new sessions
-    if new_sessions >= 3:
+    # Update if enough new sessions
+    if new_sessions >= update_sessions:
         return True
     
     return False
@@ -221,4 +227,100 @@ def get_project_memory(project_id):
         memory_text += f"KEY TOPICS: {memory.key_topics}\n"
     memory_text += f"\nPROJECT MEMORY:\n{memory.memory_text}"
     
-    return memory_text 
+    return memory_text
+
+def get_recent_project_context(project_id, hours_back=None, max_messages=None):
+    """
+    Get recent chat context from the last N hours for immediate recall
+    This provides quick access to recent information without waiting for memory updates
+    """
+    from datetime import datetime, timedelta
+    from flask import current_app
+    
+    # Use configurable defaults or fallback to reasonable defaults
+    if hours_back is None:
+        hours_back = current_app.config.get('RECENT_CONTEXT_HOURS', 24)
+    if max_messages is None:
+        max_messages = current_app.config.get('RECENT_CONTEXT_MAX_MESSAGES', 50)
+    
+    # Get recent chat sessions
+    cutoff_time = datetime.utcnow() - timedelta(hours=hours_back)
+    recent_sessions = ChatSession.query.filter(
+        ChatSession.project_id == project_id,
+        ChatSession.created_at >= cutoff_time
+    ).order_by(ChatSession.created_at.desc()).all()
+    
+    if not recent_sessions:
+        return None
+    
+    # Collect recent messages
+    recent_messages = []
+    total_messages = 0
+    
+    for session in recent_sessions:
+        if total_messages >= max_messages:
+            break
+            
+        try:
+            chat_history = session.get_chat_history()
+            for msg in reversed(chat_history):  # Start with most recent
+                if total_messages >= max_messages:
+                    break
+                recent_messages.append({
+                    'role': msg['role'],
+                    'content': msg['content'],
+                    'session_time': session.created_at
+                })
+                total_messages += 1
+        except Exception as e:
+            print(f"Error reading chat history for session {session.id}: {e}")
+            continue
+    
+    if not recent_messages:
+        return None
+    
+    # Reverse to get chronological order
+    recent_messages.reverse()
+    
+    # Format recent context
+    context_text = f"RECENT PROJECT CONTEXT (Last {hours_back} hours):\n"
+    context_text += "=" * 50 + "\n"
+    
+    for msg in recent_messages:
+        role = msg['role'].capitalize()
+        content = msg['content']
+        # Truncate very long messages
+        if len(content) > 500:
+            content = content[:500] + "..."
+        context_text += f"{role}: {content}\n\n"
+    
+    context_text += "=" * 50 + "\n"
+    context_text += "Use this recent context to provide immediate, relevant responses.\n"
+    context_text += "This information is from recent chat sessions and should be prioritized for current questions.\n\n"
+    
+    return context_text
+
+def get_enhanced_project_context(project_id):
+    """
+    Get both long-term project memory and recent context for comprehensive recall
+    """
+    # Get long-term memory
+    long_term_memory = get_project_memory(project_id)
+    
+    # Get recent context
+    recent_context = get_recent_project_context(project_id)
+    
+    # Combine them
+    enhanced_context = ""
+    
+    if long_term_memory:
+        enhanced_context += "==== LONG-TERM PROJECT MEMORY ====\n"
+        enhanced_context += long_term_memory + "\n\n"
+    
+    if recent_context:
+        enhanced_context += recent_context
+    
+    if not enhanced_context:
+        return None
+    
+    return enhanced_context 

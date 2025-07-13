@@ -42,6 +42,12 @@ class Config:
     CLAUDE_CHAT_MODEL = "claude-3-7-sonnet-20250219"
     CLAUDE_CHAT_MAX_TOKENS = 16384
 
+    # Project memory settings
+    PROJECT_MEMORY_UPDATE_HOURS = 24  # How often to update long-term memory
+    PROJECT_MEMORY_UPDATE_SESSIONS = 3  # How many sessions before updating memory
+    RECENT_CONTEXT_HOURS = 24  # How far back to look for recent context
+    RECENT_CONTEXT_MAX_MESSAGES = 50  # Max messages to include in recent context
+
     PROMO_CODES = ["FoundationAIconf", "BuildGoodAI"]
 
     if not OPENAI_API_KEY:

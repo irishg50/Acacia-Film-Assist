@@ -18,7 +18,7 @@ import openai
 import requests
 from io import BytesIO
 from app.services.chat_memory_service import generate_user_memory, get_user_memory
-from app.services.project_memory_service import get_incremental_project_memory, get_project_memory
+from app.services.project_memory_service import get_incremental_project_memory, get_project_memory, get_enhanced_project_context
 import tempfile
 from tempfile import NamedTemporaryFile
 import pandas as pd
@@ -598,23 +598,24 @@ Do not repeat or summarize previous questions and answers from the current sessi
             else:
                 using_documents = False
 
-        # Build system prompt with user memory, user background, and project memory
+        # Build system prompt with user memory, user background, and enhanced project context
         user_memory = get_user_memory(current_user.id)
         user_background = generate_user_background(current_user.id)
-        project_memory = get_project_memory(project_id)
+        enhanced_project_context = get_enhanced_project_context(project_id)
         
         system_prompt_full = ""
         
-        # Add project memory context
-        if project_memory:
+        # Add enhanced project context (includes both long-term memory and recent context)
+        if enhanced_project_context:
             system_prompt_full += (
                 "==== PROJECT CONTEXT ===="
-                f"\n{project_memory}\n"
+                f"\n{enhanced_project_context}\n"
                 "==== END OF PROJECT CONTEXT ====\n\n"
                 "**Use this project context to:**\n"
                 "- Align recommendations with project goals and timeline\n"
                 "- Reference relevant previous discussions and decisions\n"
-                "- Build upon established strategies and progress\n\n"
+                "- Build upon established strategies and progress\n"
+                "- Prioritize recent information for immediate questions\n\n"
             )
         
         if user_memory:

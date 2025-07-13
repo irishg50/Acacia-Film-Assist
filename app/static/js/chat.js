@@ -921,13 +921,13 @@ async function loadProjects() {
 
         if (projectSelect) {
             projectSelect.innerHTML = `
-                <option value="" disabled ${!currentProject ? 'selected' : ''}>Select a Workspace</option>
+                <option value="" disabled ${!currentProject ? 'selected' : ''}>Select a Project</option>
                 ${data.projects.map(project => `
                     <option value="${project.id}" ${currentProject == project.id ? 'selected' : ''}>
                         ${project.name}
                     </option>
                 `).join('')}
-                <option value="__add__">➕ Add New Workspace</option>
+                <option value="__add__">➕ Add New Project</option>
             `;
 
             projectSelect.onchange = function() {
@@ -1496,7 +1496,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.log('No General Chat found, switching to first available project');
                     await switchProject(String(data.projects[0].id));
                 } else {
-                    addMessageToChatHistory('System', 'No projects available. Please create a workspace first.');
+                    addMessageToChatHistory('System', 'No projects available. Please create a project first.');
                 }
             }
         } catch (error) {
@@ -1541,7 +1541,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function editCurrentProject() {
     if (!currentProject) {
-        addMessageToChatHistory('System', 'Please select a workspace first.');
+        addMessageToChatHistory('System', 'Please select a project first.');
         return;
     }
 
@@ -1562,7 +1562,7 @@ async function editCurrentProject() {
         projectModal.show();
     } catch (error) {
         console.error('Error loading project:', error);
-        addMessageToChatHistory('System', 'Error loading workspace details');
+        addMessageToChatHistory('System', 'Error loading project details');
     }
 }
 
