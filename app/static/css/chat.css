@@ -1271,6 +1271,49 @@
     display: none !important;
 }
 
+/* Sidebar Tabs */
+.sidebar-tabs {
+    display: flex;
+    background: #f3f4f6;
+    border: 1.5px solid #b45309;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sidebar-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 12px;
+    font-weight: 500;
+    color: #6b3f1d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.9em;
+}
+
+.sidebar-tab:hover {
+    background: #e5e7eb;
+    color: #b45309;
+}
+
+.sidebar-tab.active {
+    background: #b45309;
+    color: white;
+}
+
+.sidebar-tab i {
+    font-size: 1.1em;
+}
+
+.sidebar-tab span {
+    white-space: nowrap;
+}
+
 .project-switcher-section {
     display: flex;
     align-items: center;

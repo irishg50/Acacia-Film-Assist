@@ -8,6 +8,7 @@ let projectModal = null;
 let editingProjectId = null;
 let deleteModal = null;
 let chatToDelete = null;
+let allChats = []; // Store all chats for search functionality
 
 const allowedTypes = ['.txt', '.pdf', '.doc', '.docx', '.csv', '.xlsx'];
 const maxFileSize = window.MAX_FILE_SIZE_BYTES || (10 * 1024 * 1024); // 10MB default
@@ -369,14 +370,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial sync
     updateToggleAllCheckbox();
 
-    // Sidebar section dropdown logic
-    const sectionSelect = document.getElementById('sidebarSectionSelect');
+    // Sidebar tabs logic
+    const sidebarTabs = document.querySelectorAll('.sidebar-tab');
     const sectionPanes = {
         'doc-library': document.getElementById('doc-library-pane'),
-        'chat-history': document.getElementById('chat-history-pane'),
-        'research-history': document.getElementById('research-history-pane')
+        'chat-history': document.getElementById('chat-history-pane')
     };
+    
     function showSidebarPane(selected) {
+        // Update tab states
+        sidebarTabs.forEach(tab => {
+            if (tab.getAttribute('data-pane') === selected) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+        
+        // Show/hide panes
         Object.keys(sectionPanes).forEach(key => {
             if (key === selected) {
                 sectionPanes[key].classList.remove('d-none');
@@ -385,19 +396,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    if (sectionSelect) {
-        sectionSelect.addEventListener('change', function() {
-            showSidebarPane(this.value);
-            if (this.value === 'research-history') {
-                loadResearchHistorySidebar();
+    
+    // Add click handlers to tabs
+    sidebarTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const pane = this.getAttribute('data-pane');
+            showSidebarPane(pane);
+        });
+    });
+    
+    // Add search functionality
+    const chatSearchInput = document.getElementById('chatSearchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    
+    if (chatSearchInput) {
+        let searchTimeout;
+        
+        // Handle search input
+        chatSearchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchChats(this.value);
+            }, 300); // Debounce search for 300ms
+            
+            // Show/hide clear button based on input value
+            if (clearSearchBtn) {
+                clearSearchBtn.style.display = this.value.trim() ? 'block' : 'none';
             }
         });
-        // Show default pane on load
-        showSidebarPane(sectionSelect.value);
-        if (sectionSelect.value === 'research-history') {
-            loadResearchHistorySidebar();
+        
+        // Handle clear button click
+        if (clearSearchBtn) {
+            clearSearchBtn.addEventListener('click', function() {
+                chatSearchInput.value = '';
+                chatSearchInput.focus();
+                clearSearchBtn.style.display = 'none';
+                searchChats(''); // Clear search results
+            });
         }
     }
+    
+    // Show default pane on load
+    showSidebarPane('doc-library');
 });
 
 // Message Management
@@ -862,8 +902,13 @@ async function loadProjects() {
 
         // If currentProject is not in the user's projects, reset it
         if (!userProjectIds.includes(localStorage.getItem('currentProject'))) {
-            // Set to first available project, or null if none
-            if (userProjectIds.length > 0) {
+            // Look for "General Chat" project first as fallback
+            const generalChatProject = data.projects.find(project => project.name === 'General Chat');
+            if (generalChatProject) {
+                localStorage.setItem('currentProject', String(generalChatProject.id));
+                currentProject = String(generalChatProject.id);
+            } else if (userProjectIds.length > 0) {
+                // Fallback to first available project if no General Chat
                 localStorage.setItem('currentProject', userProjectIds[0]);
                 currentProject = userProjectIds[0];
             } else {
@@ -1042,39 +1087,126 @@ async function loadChatList() {
         const chatList = document.getElementById('previousChats');
 
         if (chatList && data.chats) {
+            // Store all chats for search functionality
+            allChats = data.chats;
+            
             if (data.chats.length === 0) {
                 chatList.innerHTML = '<div class="text-muted">No previous chats in this project</div>';
             } else {
-                chatList.innerHTML = data.chats.map(chat => `
-                    <div class="chat-preview p-2 mb-2 border rounded">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="chat-preview-content" onclick="loadChat('${chat.session_id}')">
-                                <div class="chat-header d-flex align-items-center">
-                                    ${chat.pinned ? '<i class="bi bi-star-fill text-warning me-2"></i>' : ''}
-                                    <div class="small text-muted">
-                                        ${getRelativeDateDescription(chat.created_at)}
-                                    </div>
-                                </div>
-                                <div class="chat-text">
-                                    ${chat.preview || 'Empty chat'}
-                                </div>
-                            </div>
-                            <div class="chat-actions">
-                                <button class="btn btn-link p-1" onclick="togglePin('${chat.session_id}', ${chat.pinned})">
-                                    <i class="bi ${chat.pinned ? 'bi-star-fill text-warning' : 'bi-star'}"></i>
-                                </button>
-                                <button class="btn btn-link text-danger p-1" onclick="confirmDeleteChat('${chat.session_id}')">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+                renderChatList(data.chats);
             }
         }
     } catch (error) {
         console.error('Error loading chat list:', error);
     }
+}
+
+// Function to render chat list with search filtering
+function renderChatList(chatsToRender) {
+    const chatList = document.getElementById('previousChats');
+    const searchTerm = document.getElementById('chatSearchInput')?.value?.toLowerCase() || '';
+    
+    if (chatsToRender.length === 0) {
+        chatList.innerHTML = '<div class="text-muted">No chats found</div>';
+        return;
+    }
+    
+    // Separate pinned and unpinned chats
+    const pinnedChats = chatsToRender.filter(chat => chat.pinned);
+    const unpinnedChats = chatsToRender.filter(chat => !chat.pinned);
+    
+    // Sort unpinned chats by date (most recent first)
+    unpinnedChats.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    // Take the most recent unpinned chats to fill remaining slots
+    const maxUnpinnedChats = 50 - pinnedChats.length;
+    const recentUnpinnedChats = unpinnedChats.slice(0, Math.max(0, maxUnpinnedChats));
+    
+    // Combine pinned chats with recent unpinned chats
+    const displayChats = [...pinnedChats, ...recentUnpinnedChats];
+    
+    // Sort by date for display (pinned chats will appear at top due to their age)
+    displayChats.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    chatList.innerHTML = displayChats.map(chat => `
+        <div class="chat-preview p-2 mb-2 border rounded">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="chat-preview-content" onclick="loadChat('${chat.session_id}')">
+                    <div class="chat-header d-flex align-items-center">
+                        ${chat.pinned ? '<i class="bi bi-star-fill text-warning me-2"></i>' : ''}
+                        <div class="small text-muted">
+                            ${getRelativeDateDescription(chat.created_at)}
+                        </div>
+                    </div>
+                    <div class="chat-text">
+                        ${chat.preview || 'Empty chat'}
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="btn btn-link p-1" onclick="togglePin('${chat.session_id}', ${chat.pinned})">
+                        <i class="bi ${chat.pinned ? 'bi-star-fill text-warning' : 'bi-star'}"></i>
+                    </button>
+                    <button class="btn btn-link text-danger p-1" onclick="confirmDeleteChat('${chat.session_id}')">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Add a note if we're limiting the display
+    if (allChats.length > displayChats.length) {
+        const hiddenCount = allChats.length - displayChats.length;
+        chatList.innerHTML += `
+            <div class="text-muted small text-center mt-2 p-2 border-top">
+                Showing ${displayChats.length} of ${allChats.length} chats (${hiddenCount} older chats hidden)
+            </div>
+        `;
+    }
+}
+
+// Function to search chats
+async function searchChats(searchTerm) {
+    if (!searchTerm.trim()) {
+        // If search is empty, show all chats with normal limit
+        renderChatList(allChats);
+        return;
+    }
+    
+    const searchLower = searchTerm.toLowerCase();
+    const matchingChats = [];
+    
+    // Search through all chats
+    for (const chat of allChats) {
+        // Check if search term matches preview (visible content)
+        if (chat.preview && chat.preview.toLowerCase().includes(searchLower)) {
+            matchingChats.push(chat);
+            continue;
+        }
+        
+        // If not found in preview, fetch full chat content to search
+        try {
+            const response = await fetch(`${baseUrl}/api/chats/${chat.session_id}`);
+            if (response.ok) {
+                const chatData = await response.json();
+                const chatHistory = chatData.chat_history || [];
+                
+                // Search through all messages in the chat
+                const hasMatch = chatHistory.some(message => 
+                    message.content && message.content.toLowerCase().includes(searchLower)
+                );
+                
+                if (hasMatch) {
+                    matchingChats.push(chat);
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching chat ${chat.session_id} for search:`, error);
+        }
+    }
+    
+    // Render matching chats
+    renderChatList(matchingChats);
 }
 
 async function togglePin(sessionId, currentPinned) {
@@ -1350,6 +1482,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error initializing project:', error);
             addMessageToChatHistory('System', 'Error initializing project');
         }
+    } else {
+        // Fallback: if no project is selected, try to find and switch to General Chat
+        try {
+            const response = await fetch(`${baseUrl}/api/projects`);
+            if (response.ok) {
+                const data = await response.json();
+                const generalChatProject = data.projects.find(project => project.name === 'General Chat');
+                if (generalChatProject) {
+                    console.log('No project selected, switching to General Chat as fallback');
+                    await switchProject(String(generalChatProject.id));
+                } else if (data.projects.length > 0) {
+                    console.log('No General Chat found, switching to first available project');
+                    await switchProject(String(data.projects[0].id));
+                } else {
+                    addMessageToChatHistory('System', 'No projects available. Please create a workspace first.');
+                }
+            }
+        } catch (error) {
+            console.error('Error in fallback project initialization:', error);
+            addMessageToChatHistory('System', 'Error initializing fallback project');
+        }
     }
 
     // Quick Upload Button Handler
@@ -1533,66 +1686,3 @@ function submitSuggestedQuestion(question) {
     sendMessage();
 }
 
-function renderResearchHistoryList(researchHistory) {
-    const container = document.getElementById('research-history-pane');
-    if (!container) return;
-    if (!researchHistory.length) {
-        container.innerHTML = '<div class="text-muted p-3">No research history for this workspace yet.</div>';
-        return;
-    }
-    container.innerHTML = researchHistory.map(item => `
-        <div class="research-item p-3 mb-3 border rounded" style="background: #fff;">
-            <div class="d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">${item.topic}</h6>
-                <span class="text-muted small">${new Date(item.created_at).toLocaleString()}</span>
-            </div>
-            <div class="text-muted small mb-2">
-                ${item.focus_areas && item.focus_areas.length ? `Focus: ${item.focus_areas.join(', ')}` : ''}
-            </div>
-            <div class="research-preview" style="cursor:pointer; color:#b45309;" data-session-id="${item.id}">
-                ${item.preview}
-                <span class="ms-2" style="font-size:0.9em;">[Expand]</span>
-            </div>
-            <div class="research-full d-none mt-2" id="research-full-${item.id}">
-                <div style="white-space: pre-line;">${item.research_content}</div>
-                <span class="text-primary small" style="cursor:pointer;" data-session-id="${item.id}">[Collapse]</span>
-            </div>
-        </div>
-    `).join('');
-    // Add expand/collapse listeners
-    container.querySelectorAll('.research-preview').forEach(el => {
-        el.onclick = function() {
-            const id = this.getAttribute('data-session-id');
-            document.getElementById('research-full-' + id).classList.remove('d-none');
-            this.classList.add('d-none');
-        };
-    });
-    container.querySelectorAll('.research-full .text-primary').forEach(el => {
-        el.onclick = function() {
-            const id = this.getAttribute('data-session-id');
-            document.getElementById('research-full-' + id).classList.add('d-none');
-            container.querySelector('.research-preview[data-session-id="' + id + '"]').classList.remove('d-none');
-        };
-    });
-}
-
-async function loadResearchHistorySidebar() {
-    if (!currentProject) {
-        document.getElementById('research-history-pane').innerHTML = '<div class="text-muted p-3">Please select a workspace to view research history.</div>';
-        return;
-    }
-    try {
-        const response = await fetch(`${baseUrl}/api/research/history?project_id=${currentProject}`);
-        if (!response.ok) throw new Error('Failed to load research history');
-        const data = await response.json();
-        // Parse focus_areas if needed
-        const researchHistory = (data.research_history || []).map(item => ({
-            ...item,
-            focus_areas: typeof item.focus_areas === 'string' ? JSON.parse(item.focus_areas || '[]') : (item.focus_areas || []),
-            preview: item.research_content.slice(0, 180) + (item.research_content.length > 180 ? '...' : ''),
-        }));
-        renderResearchHistoryList(researchHistory);
-    } catch (error) {
-        document.getElementById('research-history-pane').innerHTML = '<div class="text-danger p-3">Error loading research history.</div>';
-    }
-}

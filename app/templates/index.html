@@ -48,13 +48,18 @@
                 <i class="bi bi-plus-circle"></i>
                 <span class="ms-2">Start New Chat</span>
             </button>
-            <!-- Sidebar section selector -->
+            <!-- Sidebar section tabs -->
             <div class="mb-3">
-                <select id="sidebarSectionSelect" class="form-select" style="font-weight: 500; background: #f3f4f6; color: #6b3f1d; border: 1.5px solid #b45309; border-radius: 8px;">
-                    <option value="doc-library" selected>Document Library</option>
-                    <option value="chat-history">Chat History</option>
-                    <option value="research-history">Research History</option>
-                </select>
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab active" data-pane="doc-library">
+                        <i class="bi bi-folder2-open"></i>
+                        <span>Documents</span>
+                    </button>
+                    <button class="sidebar-tab" data-pane="chat-history">
+                        <i class="bi bi-chat-dots"></i>
+                        <span>Chat History</span>
+                    </button>
+                </div>
             </div>
             <div id="sidebarSectionPanes">
                 <div class="sidebar-section-pane" id="doc-library-pane">
@@ -97,14 +102,17 @@
                 <div class="sidebar-section-pane d-none" id="chat-history-pane">
                     <!-- Chat History content here -->
                     <div class="chats-section">
-                        <h5>Chat History for this Workspace</h5>
+                        <h5>Chat History</h5>
+                        <div class="mb-3" style="position: relative;">
+                            <input type="text" id="chatSearchInput" class="form-control form-control-sm" placeholder="Search chats..." style="font-size: 0.9em; padding-right: 30px;">
+                            <button id="clearSearchBtn" class="btn btn-sm" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; display: none; padding: 2px 6px;" title="Clear search">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
                         <div id="previousChats" class="border rounded p-3 bg-light">
                             <!-- Chat history will be populated here -->
                         </div>
                     </div>
-                </div>
-                <div class="sidebar-section-pane d-none" id="research-history-pane">
-                    <!-- Research history will be loaded here by JS -->
                 </div>
             </div>
         </div>

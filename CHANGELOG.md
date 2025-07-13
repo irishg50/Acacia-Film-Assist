@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 ### Added
+- **Enhanced Project Memory System**: Implemented a comprehensive project-specific memory system that tracks project goals, status, timeline, and key topics across all chat sessions within a project.
+- **Smart Memory Update Logic**: Project memory now updates automatically based on intelligent triggers: 3+ new chat sessions, 24+ hours since last update, or manual force updates.
+- **Structured Project Memory**: Memory now includes structured fields for project status, goals, timeline, and key topics, making it easier for the AI to provide context-aware responses.
+- **Conversational Response Guidelines**: Added system prompt instructions to ensure the AI responds in a natural, conversational tone with minimal use of nested bullet points and excessive formatting.
+- **Background Memory Processing**: Project memory updates now run in the background during chat initialization, preventing user blocking during LLM calls.
+- **Project Memory API Endpoints**: Added endpoints to manually trigger and retrieve project memory for testing and debugging purposes.
 - **User Chat History Memory**: The system now summarizes each user's previous chat sessions and injects a memory summary into the assistant's context. This enables the assistant to reference past topics, preferences, and recurring questions when appropriate.
 - **User Memory in System Prompt**: The system prompt and OpenAI Assistant instructions now include guidance for referencing user memory, including a new instruction to remind users when a previously discussed topic is revisited, with a short summary.
 - **Chat UI Improvements**: Chat history now scrolls within the available window, and the chat request area is pinned to the bottom for a modern chat experience. Messages alternate between user and AI in a single scrollable area.

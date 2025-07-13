@@ -72,6 +72,60 @@ def update_project(project_id):
         'updated_at': project.updated_at.isoformat()
     })
 
+@project_bp.route('/api/projects/<int:project_id>/memory', methods=['POST'])
+@login_required
+def update_project_memory(project_id):
+    """Manually trigger project memory update"""
+    try:
+        from app.services.project_memory_service import get_incremental_project_memory, get_project_memory
+        
+        # Verify project belongs to user
+        project = Project.query.filter_by(id=project_id, user_id=current_user.id).first_or_404()
+        
+        # Force memory update
+        memory = get_incremental_project_memory(project_id)
+        
+        if memory:
+            return jsonify({
+                'status': 'success',
+                'message': 'Project memory updated successfully',
+                'memory': get_project_memory(project_id)
+            })
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': 'Failed to update project memory'
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error updating project memory: {str(e)}'
+        }), 500
+
+@project_bp.route('/api/projects/<int:project_id>/memory', methods=['GET'])
+@login_required
+def get_project_memory_endpoint(project_id):
+    """Get current project memory"""
+    try:
+        from app.services.project_memory_service import get_project_memory
+        
+        # Verify project belongs to user
+        project = Project.query.filter_by(id=project_id, user_id=current_user.id).first_or_404()
+        
+        memory_text = get_project_memory(project_id)
+        
+        return jsonify({
+            'status': 'success',
+            'memory': memory_text
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error retrieving project memory: {str(e)}'
+        }), 500
+
 @project_bp.route('/api/projects/<int:project_id>', methods=['DELETE'])
 @login_required
 def delete_project(project_id):

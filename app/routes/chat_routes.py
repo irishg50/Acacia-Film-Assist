@@ -18,6 +18,7 @@ import openai
 import requests
 from io import BytesIO
 from app.services.chat_memory_service import generate_user_memory, get_user_memory
+from app.services.project_memory_service import get_incremental_project_memory, get_project_memory
 import tempfile
 from tempfile import NamedTemporaryFile
 import pandas as pd
@@ -344,6 +345,16 @@ def chat():
         system_prompt = """
 You are MONT-E, a professional Documentary Film Production Assistant dedicated to supporting filmmakers at Nomad Films in all aspects of their documentary production work. Your expertise covers proposal writing, script development, production logistics, budgeting, storyboarding, editing workflows, and marketing strategies. Your purpose is to help documentary filmmakers achieve their creative vision efficiently, ethically, and with maximum impact.
 
+## Response Style Guidelines
+
+- Respond in a conversational, colleague-like tone that feels natural and engaging.
+- Prefer paragraphs and narrative explanations over lists and bullet points.
+- Avoid using nested bullet points or excessive indentation.
+- If a list is necessary, keep it flat (no sub-lists) and concise.
+- Do not insert blank lines between parent and sub-list items.
+- When possible, weave information into sentences and paragraphs for a more natural flow.
+- Use clear, descriptive language that builds understanding through context.
+
 When responding:
 1. Always begin your response by acknowledging the filmmaker's question or request.
 2. Provide clear, actionable advice tailored to the specific documentary project, production phase, or creative challenge.
@@ -551,6 +562,14 @@ Do not repeat or summarize previous questions and answers from the current sessi
         project = Project.query.get(project_id)
         if not project:
             return json.dumps({"error": "Invalid project"}), 404
+        
+        # Background project memory update (non-blocking)
+        try:
+            # Trigger project memory update in background
+            get_incremental_project_memory(project_id)
+        except Exception as e:
+            print(f"Background project memory update failed: {e}")
+            # Continue with chat even if memory update fails
 
         # Get documents content only if document_ids is provided
         documents_content = ""
@@ -574,10 +593,25 @@ Do not repeat or summarize previous questions and answers from the current sessi
             else:
                 using_documents = False
 
-        # Build system prompt with user memory and user background
+        # Build system prompt with user memory, user background, and project memory
         user_memory = get_user_memory(current_user.id)
         user_background = generate_user_background(current_user.id)
+        project_memory = get_project_memory(project_id)
+        
         system_prompt_full = ""
+        
+        # Add project memory context
+        if project_memory:
+            system_prompt_full += (
+                "==== PROJECT CONTEXT ===="
+                f"\n{project_memory}\n"
+                "==== END OF PROJECT CONTEXT ====\n\n"
+                "**Use this project context to:**\n"
+                "- Align recommendations with project goals and timeline\n"
+                "- Reference relevant previous discussions and decisions\n"
+                "- Build upon established strategies and progress\n\n"
+            )
+        
         if user_memory:
             system_prompt_full += (
                 "==== USER MEMORY: SUMMARY OF PREVIOUS CONVERSATIONS ===="

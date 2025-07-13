@@ -192,6 +192,24 @@ class UserChatMemory(db.Model):
     def __repr__(self):
         return f'<UserChatMemory user_id={self.user_id}>'
 
+
+class ProjectMemory(db.Model):
+    __tablename__ = 'nomadchat_project_memory'
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('nomadchat_project.id'), nullable=False, unique=True)
+    memory_text = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(100), nullable=True)  # Project status
+    goals = db.Column(db.Text, nullable=True)  # Project goals
+    timeline = db.Column(db.Text, nullable=True)  # Project timeline
+    key_topics = db.Column(db.Text, nullable=True)  # Key topics discussed
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+    last_chat_count = db.Column(db.Integer, default=0)  # Track chat sessions for update logic
+
+    project = db.relationship('Project', backref=db.backref('project_memory', uselist=False))
+
+    def __repr__(self):
+        return f'<ProjectMemory project_id={self.project_id}>'
+
 class UserAgreement(db.Model):
     __tablename__ = 'nomadchat_user_agreement'
     id = db.Column(db.Integer, primary_key=True)
