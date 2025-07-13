@@ -50,7 +50,7 @@ def summarize_with_llm(history_text):
     )
     client = openai.OpenAI()  # Assumes API key is set in environment or config
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4.1-nano",  # Using summation model for memory generation
         messages=[{"role": "system", "content": prompt}],
         max_tokens=512,
         temperature=0.2,

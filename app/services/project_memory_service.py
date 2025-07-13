@@ -169,7 +169,7 @@ Focus on documentary filmmaking context and be concise but comprehensive.
     try:
         client = openai.OpenAI()
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4.1-nano",  # Using summation model for project memory
             messages=[{"role": "system", "content": prompt}],
             max_tokens=1000,
             temperature=0.3,

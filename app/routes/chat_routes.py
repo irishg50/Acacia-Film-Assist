@@ -221,6 +221,7 @@ def stream_openai_chat_completion(messages, system_prompt=None):
     from openai import OpenAI
     client = OpenAI(api_key=current_app.config.get('OPENAI_API_KEY'))
     model = current_app.config.get('OPENAI_CHAT_MODEL', 'gpt-4o')
+    max_tokens = current_app.config.get('OPENAI_CHAT_MAX_TOKENS', 16384)
     openai_messages = []
     if system_prompt:
         openai_messages.append({"role": "system", "content": system_prompt})
@@ -230,7 +231,8 @@ def stream_openai_chat_completion(messages, system_prompt=None):
         model=model,
         messages=openai_messages,
         stream=True,
-        temperature=0.7
+        temperature=0.7,
+        max_tokens=max_tokens
     )
     buffer = ""
     for chunk in response:

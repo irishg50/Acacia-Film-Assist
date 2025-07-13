@@ -29,8 +29,11 @@ class Config:
     MODEL_PROVIDER = os.getenv('MODEL_PROVIDER', 'openai')  # 'anthropic' or 'openai'
 
     # Model settings
-    OPENAI_MODEL = "gpt-4.1 mini"
-    OPENAI_MAX_TOKENS = 4096
+    OPENAI_MODEL = "gpt-4.1-mini"
+    OPENAI_SUMMATION_MODEL = "gpt-4.1-nano"
+    OPENAI_MAX_TOKENS = 16384  # Increased from 4096 for better response quality
+    OPENAI_CHAT_MODEL = "gpt-4.1-mini"  # Add explicit chat model setting
+    OPENAI_CHAT_MAX_TOKENS = 16384  # Higher limit for chat completions
     CLAUDE_MODEL = "claude-3-7-sonnet-20250219"
     CLAUDE_MAX_TOKENS = 16384
     GEMINI_MODEL = "gemini-1"

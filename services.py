@@ -183,8 +183,8 @@ def generate_claude_response(prompt, temperature, chat_history, file_contents, s
         print(f"Session ID: {session_id}")
 
         data = {
-            "model": "claude-3-5-sonnet-20240620",
-            "max_tokens": 2000,
+            "model": current_app.config.get('CLAUDE_MODEL', 'claude-3-5-sonnet-20240620'),
+            "max_tokens": current_app.config.get('CLAUDE_MAX_TOKENS', 16384),
             "temperature": temperature,
             "system": [
                 {
@@ -381,7 +381,7 @@ def generate_gemini_response(prompt, temperature, chat_history, file_contents, s
             messages,
             generation_config=genai.types.GenerationConfig(
                 temperature=temperature,
-                max_output_tokens=2000,
+                max_output_tokens=current_app.config.get('GEMINI_MAX_TOKENS', 2048),
             )
         )
 

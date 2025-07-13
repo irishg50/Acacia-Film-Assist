@@ -950,7 +950,7 @@ function createNewProject() {
     projectModal = projectModal || new bootstrap.Modal(document.getElementById('projectModal'));
     document.getElementById('projectName').value = '';
     document.getElementById('projectDescription').value = '';
-    document.querySelector('#projectModal .modal-title').textContent = 'Create New Workspace';
+            document.querySelector('#projectModal .modal-title').textContent = 'Create New Project';
     projectModal.show();
 }
 
@@ -1334,7 +1334,7 @@ function handleFileUpload(event) {
     const files = Array.from(fileInput.files);
 
     if (!currentProject) {
-        addMessageToChatHistory('System', 'Please select a project first');
+        addMessageToChatHistory('System', 'Please select a project first.');
         fileInput.value = '';
         return;
     }
@@ -1521,7 +1521,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         quickFileInput.addEventListener('change', handleFileUpload);
     }
 
-    // Show/hide edit pencil icon based on selected workspace
+    // Show/hide edit pencil icon based on selected project
     const projectSelect = document.getElementById('projectSelect');
     const editProjectIcon = document.getElementById('editProjectIcon');
     function updateEditIconVisibility() {
@@ -1558,7 +1558,7 @@ async function editCurrentProject() {
         document.getElementById('systemInstructions').value = project.system_instructions || '';
 
         // Update modal title
-        document.querySelector('#projectModal .modal-title').textContent = 'Edit Workspace';
+        document.querySelector('#projectModal .modal-title').textContent = 'Edit Project';
         projectModal.show();
     } catch (error) {
         console.error('Error loading project:', error);
@@ -1568,7 +1568,7 @@ async function editCurrentProject() {
 
 async function clearChatAndUploads() {
     if (!currentProject) {
-        addMessageToChatHistory('System', 'Please select a workspace first.');
+        addMessageToChatHistory('System', 'Please select a project first.');
         return;
     }
 

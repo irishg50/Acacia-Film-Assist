@@ -9,15 +9,15 @@
 
 {% block content %}
 <div class="project-switcher-section mb-3" style="background: #f3f4f6;">
-    <div class="project-label" style="font-size: 0.92em; font-weight: 500; opacity: 0.85; color: #6b3f1d;">Current Workspace:</div>
+    <div class="project-label" style="font-size: 0.92em; font-weight: 500; opacity: 0.85; color: #6b3f1d;">Current Project:</div>
     <div style="position: relative; margin-top: 0.5em; width: 100%; max-width: 98vw;">
         <select id="projectSelect" class="project-title-select" style="font-size: 1.1em; font-weight: bold; background: #f3f4f6; color: #6b3f1d; border: 1.5px solid #b45309; border-radius: 10px; padding: 8px 60px 8px 12px; margin-bottom: 0.5em; appearance: none; width: 100%; min-width: 220px;">
-            <option value="" disabled>Change Workspace</option>
+            <option value="" disabled>Change Project</option>
             <!-- Project options will be populated here by JS -->
-            <option value="__add__">➕ Add New Workspace</option>
+            <option value="__add__">➕ Add New Project</option>
         </select>
         <span style="position: absolute; right: 8px; top: 0; height: 100%; width: 48px; display: flex; align-items: center; pointer-events: none;">
-            <button id="editProjectIcon" title="Edit Workspace" style="background: none; border: none; color: #b45309; cursor: pointer; padding: 0; display: flex; align-items: center; margin-right: 8px; pointer-events: auto;" onclick="editCurrentProject()">
+            <button id="editProjectIcon" title="Edit Project" style="background: none; border: none; color: #b45309; cursor: pointer; padding: 0; display: flex; align-items: center; margin-right: 8px; pointer-events: auto;" onclick="editCurrentProject()">
                 <i class="bi bi-pencil" style="font-size: 1.2em;"></i>
             </button>
             <span style="font-size: 1.1em; color: #b45309; user-select: none; margin-left: auto;">▼</span>
@@ -143,12 +143,12 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create New Workspace</h5>
+                <h5 class="modal-title">Create New Project</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="projectName" class="form-label">Workspace Name</label>
+                    <label for="projectName" class="form-label">Project Name</label>
                     <input type="text" class="form-control" id="projectName">
                 </div>
                 <div class="mb-3">
@@ -158,15 +158,15 @@
                 <div class="mb-3">
                     <label for="customPrompt" class="form-label">System Instructions</label>
                     <textarea class="form-control" id="systemInstructions" rows="4"
-                              placeholder="Enter any special instructions for Claude when working on this workspace..."></textarea>
+                              placeholder="Enter any special instructions for Claude when working on this project..."></textarea>
                     <small class="form-text text-muted">
-                        These instructions will be included with every prompt sent to Claude for this workspace.
+                        These instructions will be included with every prompt sent to Claude for this project.
                     </small>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveProject()">Save Workspace</button>
+                <button type="button" class="btn btn-primary" onclick="saveProject()">Save Project</button>
             </div>
         </div>
     </div>

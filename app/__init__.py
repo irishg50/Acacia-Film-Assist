@@ -45,6 +45,7 @@ def create_app():
 
     # Initialize database tables
     with app.app_context():
+        tables_created = False
         try:
             # Check if tables exist before creating them
             inspector = inspect(db.engine)
@@ -55,8 +56,10 @@ def create_app():
                 print("Creating database tables...")
                 db.create_all()
                 print("Database tables created successfully")
+                tables_created = True
             else:
                 print(f"Database already has {len(existing_tables)} tables, skipping creation")
+                tables_created = True
                 
         except Exception as e:
             print(f"Database initialization error: {e}")
@@ -73,10 +76,24 @@ def create_app():
                     # Try creating tables again
                     db.create_all()
                     print("Database tables created successfully after index cleanup")
+                    tables_created = True
                 except Exception as retry_error:
                     print(f"Retry failed: {retry_error}")
-                    # Continue anyway - tables might already be functional
             
-            # Continue with app startup even if there are issues
+            # If tables still not created, try a more aggressive approach
+            if not tables_created:
+                print("Attempting forced table creation...")
+                try:
+                    # Drop all tables and recreate
+                    db.drop_all()
+                    db.create_all()
+                    print("Database tables created successfully after forced recreation")
+                    tables_created = True
+                except Exception as force_error:
+                    print(f"Forced creation failed: {force_error}")
+                    raise Exception(f"Failed to initialize database: {force_error}")
+            
+            if not tables_created:
+                raise Exception("Database initialization failed - tables not created")
 
     return app
