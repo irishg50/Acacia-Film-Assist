@@ -315,8 +315,11 @@ def new_chat():
         random_selected_questions = random.sample(suggested_questions_pool, 2)
         static_question = "What were we discussing recently?"
         
+        # Get user's first name for personalized greeting
+        user_firstname = current_user.firstname if current_user.firstname else "there"
+        
         # Create personalized welcome message
-        welcome_message = f"""<img src='{url_for('static', filename='img/ACACIA_sq.png')}' alt='ACACIA Icon' style='height: 2em; width: 2em; border-radius: 50%; vertical-align: middle; margin-right: 0.5em;'> <b>Hi there!</b> I'm ACACIA, your intelligent production assistant. What can I help you with?
+        welcome_message = f"""<img src='{url_for('static', filename='img/ACACIA_sq.png')}' alt='ACACIA Icon' style='height: 2em; width: 2em; border-radius: 50%; vertical-align: middle; margin-right: 0.5em;'> <b>Hi {user_firstname}!</b> I'm ACACIA, your intelligent production assistant. What can I help you with?
 
 <div class=\"suggested-questions\">\n    <button class=\"suggested-question\" onclick=\"submitSuggestedQuestion('{random_selected_questions[0]}')\">{random_selected_questions[0]}</button>\n    <button class=\"suggested-question\" onclick=\"submitSuggestedQuestion('{random_selected_questions[1]}')\">{random_selected_questions[1]}</button>\n    <button class=\"suggested-question\" onclick=\"submitSuggestedQuestion('{static_question}')\">{static_question}</button>\n</div>"""
 

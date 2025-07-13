@@ -10,6 +10,8 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     padding-top: 8px;
     padding-bottom: 8px;
+    max-width: 95vw !important;
+    width: 95vw !important;
 }
 
 
