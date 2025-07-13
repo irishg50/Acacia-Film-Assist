@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomad-chatbot"
+version = "1.0.0"
+description = "Documentary film production assistant chatbot"
+readme = "README.md"
+requires-python = ">=3.8,<3.13"
+dependencies = [
+    "Flask==3.0.3",
+    "flask_login",
+    "flask_session",
+    "openai==1.75.0",
+    "python-dotenv==1.0.1",
+    "gunicorn",
+    "Flask_Session==0.8.0",
+    "Werkzeug==3.0.3",
+    "PyMuPDF==1.24.7",
+    "python-docx==1.1.2",
+    "textstat==0.7.3",
+    "psycopg2==2.9.9",
+    "flask_sqlalchemy",
+    "anthropic",
+    "tiktoken",
+    "google-generativeai",
+    "flask_wtf",
+    "pytz",
+    "chardet",
+    "docx2txt",
+    "PyPDF2",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "tenacity>=8.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.txt", "*.md", "*.yml", "*.yaml"] 
